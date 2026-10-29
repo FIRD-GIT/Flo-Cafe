@@ -12,12 +12,14 @@ This file records meaningful project changes. It is separate from the PRD: the P
 - Added initial technical direction: Kotlin, XML UI, Firebase Authentication, Room/SQLite, and a separated application structure.
 - Added a repository README explaining coursework alignment and documentation rules.
 - Added a policy that client meeting notes contain only real tutor discussions.
+- Expanded the PRD to include a limited Sub-admin workflow, coffee-cup order progress, completion notifications, and implementation evidence requirements.
 
 ### Decisions
 
 - The first assessed scope is the Customer role rather than two complete applications.
 - Admin processing is represented only through a controlled status simulation or test mechanism where needed to demonstrate the customer workflow.
 - Advanced integration is deliberately not fixed to an unvalidated technology before the core workflow is understood.
+- XML is retained over Jetpack Compose because it is directly inspectable, aligns with the supplied lab material, and makes the code-to-screen relationship easier to demonstrate.
 
 ### Evidence
 
@@ -34,4 +36,3 @@ Future entries should include:
 - Decision and implementation summary
 - Tests/evidence
 - Commit or pull request reference
-

@@ -19,8 +19,11 @@ Priorities follow the coursework lab convention: **Must**, **Should**, **Could**
 | CAFE-12 | As a customer, I want a useful advanced feature so that the app provides more than basic CRUD. | Selected integration has a defined user value, failure fallback, test case, and documentation. | Must | Firdaos | To do |
 | CAFE-13 | As a developer, I want core validation and repository tests so that regressions are detected. | Test cases cover authentication validation, totals, order persistence, and failure paths. | Must | Firdaos | To do |
 | CAFE-14 | As a stakeholder, I want changes recorded so that decisions remain traceable. | Meaningful changes appear in the changelog and are linked to backlog/meeting evidence. | Must | Firdaos | Done |
+| CAFE-15 | As a sub-admin, I want to view incoming orders and update controlled statuses so that customers see accurate preparation progress. | Only a permitted sub-admin can access the workflow; status updates are validated, persisted, and visible to the customer. | Must | Firdaos | To do |
+| CAFE-16 | As a customer, I want a coffee-cup indicator to fill while my order is prepared so that progress is understandable at a glance. | The cup maps to defined order statuses, fills progressively, and is full when the order is ready or complete. | Must | Firdaos | To do |
+| CAFE-17 | As a customer, I want a completion notification so that I know when to collect my order. | A notification or documented in-app equivalent is triggered when the order reaches the completion threshold and remains usable if notification delivery fails. | Should | Firdaos | To do |
+| CAFE-18 | As a developer, I want an implementation evidence log so that every feature can be explained from requirement through code to mobile behaviour. | Each entry records purpose, user value, requirement/backlog link, source location, app behaviour, tests/evidence, and decision rationale. | Must | Firdaos | To do |
 
 ## Definition of done
 
 A backlog item is complete when the implementation is understandable, tested at an appropriate level, documented, and committed with a descriptive message. If stakeholder feedback changes the requirement, the original and revised intent must be traceable.
-
