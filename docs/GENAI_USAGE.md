@@ -1,13 +1,13 @@
 # Generative AI Usage Declaration Record
 
-This file is maintained by the student and must contain a truthful record of any generative AI assistance used during the project.
+I will maintain this file as a truthful record of any generative AI assistance used during the project.
 
-## Student-maintained record
+## My record
 
-Add or revise entries here as work continues. Record the date, tool or system, purpose, material contribution, and how the work was checked and understood.
+I will add or revise entries here as work continues. I will record the date, tool or system, purpose, material contribution, and how I checked and understood the work.
 
-| Date | Tool or system | Purpose and material contribution | Verification and student responsibility |
+| Date | Tool or system | Purpose and material contribution | Verification and my responsibility |
 |---|---|---|---|
 | | | | |
 
-The final coursework declaration must accurately describe all material assistance used, including assistance with requirements, documentation, coding, debugging, testing, research, or design.
+My final coursework declaration must accurately describe all material assistance used, including assistance with requirements, documentation, coding, debugging, testing, research, or design.
