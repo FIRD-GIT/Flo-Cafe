@@ -1,12 +1,13 @@
 # Generative AI Usage Declaration Record
 
-This record supports the mandatory coursework declaration. It must remain truthful and should be updated as development continues.
+This file is maintained by the student and must contain a truthful record of any generative AI assistance used during the project.
 
-## 2026-10-29
+## Student-maintained record
 
-| Tool | Purpose | Use in this milestone | Verification |
+Add or revise entries here as work continues. Record the date, tool or system, purpose, material contribution, and how the work was checked and understood.
+
+| Date | Tool or system | Purpose and material contribution | Verification and student responsibility |
 |---|---|---|---|
-| GitHub Copilot | Requirements analysis and documentation support | Helped organise the supplied coursework brief into a PRD, backlog, repository structure, and initial decision record. | The coursework brief and Lab 01 guidance were read and used as the source of requirements. The student must review, understand, and revise all project content before submission. |
+| | | | |
 
-No claim is made here that generated content is automatically suitable for submission. The final technical report must describe all material AI assistance accurately, including later coding, debugging, testing, or research use.
-
+The final coursework declaration must accurately describe all material assistance used, including assistance with requirements, documentation, coding, debugging, testing, research, or design.
