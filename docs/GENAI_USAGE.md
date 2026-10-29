@@ -8,6 +8,6 @@ I will add or revise entries here as work continues. I will record the date, too
 
 | Date | Tool or system | Purpose and material contribution | Verification and my responsibility |
 |---|---|---|---|
-| | | | |
+|29/10/2026 |Copilot |To create readme file and structure my prd in a more professional manner. As well as  | |
 
 My final coursework declaration must accurately describe all material assistance used, including assistance with requirements, documentation, coding, debugging, testing, research, or design.
