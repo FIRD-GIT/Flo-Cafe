@@ -21,7 +21,7 @@ The first delivery targets the individual Customer role. A complete admin applic
 
 ## Rationale
 
-This route is understandable for the student to explain, supports the lab's authentication requirements, avoids storing plaintext passwords, and keeps local café data separate from identity management. XML is selected because the supplied lab material demonstrates that route and it supports a clear, inspectable screen structure.
+This route is understandable for me to explain, supports the lab's authentication requirements, avoids storing plaintext passwords, and keeps local café data separate from identity management. I selected XML because the supplied lab material demonstrates that route and it supports a clear, inspectable screen structure.
 
 ## Consequences
 
@@ -33,4 +33,3 @@ This route is understandable for the student to explain, supports the lab's auth
 ## Revisit conditions
 
 Revisit this decision if tutor feedback, available infrastructure, or testing shows that a different UI or persistence route is more appropriate. Any change must be recorded in a new ADR and the changelog.
-
