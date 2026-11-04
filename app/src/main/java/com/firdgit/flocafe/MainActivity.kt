@@ -1,7 +1,6 @@
 package com.firdgit.flocafe
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -15,6 +14,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var emailInput: EditText
     private lateinit var passwordInput: EditText
     private lateinit var displayNameInput: EditText
+    private lateinit var landingText: TextView
     private lateinit var userRepository: UserRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         emailInput = findViewById(R.id.emailInput)
         passwordInput = findViewById(R.id.passwordInput)
         displayNameInput = findViewById(R.id.displayNameInput)
+        landingText = findViewById(R.id.landingText)
         userRepository = UserRepository(this)
 
         val firebaseConfigured = userRepository.isFirebaseConfigured
@@ -49,10 +50,10 @@ class MainActivity : AppCompatActivity() {
         }
         roleText.text = getString(R.string.role_loading)
         lifecycleScope.launch {
-            roleText.text = when (userRepository.currentUserRole()) {
-                UserRole.ADMIN -> getString(R.string.role_admin)
-                UserRole.CUSTOMER -> getString(R.string.role_customer)
-                null -> getString(R.string.authentication_required)
+            when (userRepository.currentUserRole()) {
+                UserRole.ADMIN -> showAuthenticatedState(UserRole.ADMIN)
+                UserRole.CUSTOMER -> showAuthenticatedState(UserRole.CUSTOMER)
+                null -> showSignedOutState()
             }
         }
     }
@@ -62,17 +63,45 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             runCatching { action() }
                 .onSuccess { role ->
-                    roleText.text = if (role == UserRole.ADMIN) {
-                        getString(R.string.role_admin)
-                    } else {
-                        getString(R.string.role_customer)
-                    }
-                    statusText.text = getString(R.string.authentication_success)
+                    showAuthenticatedState(role)
                 }
                 .onFailure { error ->
                     statusText.text = error.message ?: getString(R.string.authentication_failed)
                 }
         }
+    }
+
+    private fun showAuthenticatedState(role: UserRole) {
+        roleText.text = if (role == UserRole.ADMIN) {
+            getString(R.string.role_admin)
+        } else {
+            getString(R.string.role_customer)
+        }
+        landingText.text = if (role == UserRole.ADMIN) {
+            getString(R.string.admin_landing_message)
+        } else {
+            getString(R.string.customer_landing_message)
+        }
+        statusText.text = getString(
+            R.string.authentication_success_for_user,
+            userRepository.currentUserEmail.orEmpty(),
+        )
+        setAuthenticationEnabled(false)
+        findViewById<Button>(R.id.logoutButton).apply {
+            isEnabled = true
+            setOnClickListener {
+                userRepository.signOut()
+                showSignedOutState()
+            }
+        }
+    }
+
+    private fun showSignedOutState() {
+        roleText.text = getString(R.string.authentication_required)
+        landingText.text = getString(R.string.signed_out_landing_message)
+        statusText.text = getString(R.string.signed_out_message)
+        setAuthenticationEnabled(true)
+        findViewById<Button>(R.id.logoutButton).isEnabled = false
     }
 
     private fun setAuthenticationEnabled(enabled: Boolean) {

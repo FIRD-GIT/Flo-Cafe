@@ -16,6 +16,9 @@ class UserRepository(
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
 
+    val currentUserEmail: String?
+        get() = if (isFirebaseConfigured) auth.currentUser?.email else null
+
     suspend fun currentUserRole(): UserRole? {
         if (!isFirebaseConfigured) return null
         val uid = auth.currentUser?.uid ?: return null
@@ -57,5 +60,9 @@ class UserRepository(
         require(profile.uid.isNotBlank()) { "A user profile requires a Firebase UID." }
         check(isFirebaseConfigured) { "Firebase is not configured for this build." }
         firestore.collection("users").document(profile.uid).set(profile).await()
+    }
+
+    fun signOut() {
+        if (isFirebaseConfigured) auth.signOut()
     }
 }

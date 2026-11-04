@@ -10,10 +10,16 @@
     <string name="authentication_required">Sign in or register to continue.</string>
     <string name="authentication_in_progress">Connecting to Firebase…</string>
     <string name="authentication_success">Authentication successful.</string>
+    <string name="authentication_success_for_user">Signed in as %1$s.</string>
     <string name="authentication_failed">Authentication failed.</string>
+    <string name="signed_out_message">No account is signed in.</string>
+    <string name="signed_out_landing_message">Sign in to open the customer or sub-admin area.</string>
+    <string name="customer_landing_message">Customer area ready: menu and basket are the next workflow.</string>
+    <string name="admin_landing_message">Sub-admin area ready: order and menu controls are restricted to admins.</string>
     <string name="display_name_hint">Display name (registration only)</string>
     <string name="email_hint">Email address</string>
     <string name="password_hint">Password</string>
     <string name="sign_in">Sign in</string>
     <string name="register_customer">Register customer</string>
+    <string name="sign_out">Sign out</string>
 </resources>

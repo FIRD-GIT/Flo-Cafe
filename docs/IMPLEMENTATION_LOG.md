@@ -73,3 +73,13 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Code-to-screen translation:** the launcher shows email/password controls and sign-in/registration actions when Firebase is configured. Without configuration, the same controls remain visible but disabled with an explicit setup message.
 - **Validation:** debug build and emulator launch verified; live account creation and role lookup require `google-services.json` and Firebase Authentication.
 - **Known limitations:** admin assignment remains a trusted Firestore operation; customer navigation and logout are follow-up work.
+
+## 2026-11-04 — Role landing and session controls
+
+- **Status:** Implemented; live Firebase testing remains pending until project configuration is supplied.
+- **Requirement links:** PRD FR-02, FR-14; CAFE-02, CAFE-15.
+- **Purpose and user value:** make the authenticated customer/sub-admin distinction visible and provide a safe sign-out path.
+- **Code location:** `MainActivity.kt`, `UserRepository.kt`, `activity_main.xml`, and `strings.xml`.
+- **Code-to-screen translation:** an existing Firebase session is restored on launch, the user sees the role-specific landing message, and sign-out returns to the unauthenticated state.
+- **Validation:** debug build and emulator launch verified; role-specific live validation requires Firebase accounts and Firestore data.
+- **Known limitations:** full customer menu and sub-admin order controls are the next feature slice.
