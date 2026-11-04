@@ -50,3 +50,6 @@ Future entries should include:
 
 - Backlog: CAFE-01, CAFE-02, CAFE-03, CAFE-13, CAFE-15, CAFE-18.
 - Source: `app/src/main/java/com/firdgit/flocafe/UserProfile.kt`, `UserRepository.kt`, and `firestore.rules`.
+## 2026-11-04
+
+- Made Google Services integration conditional on `app/google-services.json`, so the Android project remains buildable before Firebase project setup while enabling live Firebase configuration automatically once the file is added.
