@@ -6,4 +6,14 @@
     <string name="role_customer">Customer access</string>
     <string name="role_admin">Sub-admin access</string>
     <string name="firebase_configuration_required">Add google-services.json to connect Firebase.</string>
+    <string name="firebase_setup_hint">Authentication is disabled until the Firebase project is connected.</string>
+    <string name="authentication_required">Sign in or register to continue.</string>
+    <string name="authentication_in_progress">Connecting to Firebase…</string>
+    <string name="authentication_success">Authentication successful.</string>
+    <string name="authentication_failed">Authentication failed.</string>
+    <string name="display_name_hint">Display name (registration only)</string>
+    <string name="email_hint">Email address</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="register_customer">Register customer</string>
 </resources>

@@ -24,6 +24,35 @@ class UserRepository(
         return if (profile.isAdmin) UserRole.ADMIN else UserRole.CUSTOMER
     }
 
+    suspend fun signIn(email: String, password: String): UserRole {
+        require(email.isNotBlank()) { "Email is required." }
+        require(password.isNotBlank()) { "Password is required." }
+        check(isFirebaseConfigured) { "Firebase is not configured for this build." }
+        auth.signInWithEmailAndPassword(email.trim(), password).await()
+        return currentUserRole() ?: UserRole.CUSTOMER
+    }
+
+    suspend fun registerCustomer(
+        email: String,
+        password: String,
+        displayName: String,
+    ): UserRole {
+        require(email.isNotBlank()) { "Email is required." }
+        require(password.length >= 6) { "Password must contain at least 6 characters." }
+        check(isFirebaseConfigured) { "Firebase is not configured for this build." }
+        val result = auth.createUserWithEmailAndPassword(email.trim(), password).await()
+        val firebaseUser = requireNotNull(result.user) { "Firebase did not return the new user." }
+        saveUserProfile(
+            UserProfile(
+                uid = firebaseUser.uid,
+                email = firebaseUser.email.orEmpty(),
+                displayName = displayName.trim(),
+                isAdmin = false,
+            ),
+        )
+        return UserRole.CUSTOMER
+    }
+
     suspend fun saveUserProfile(profile: UserProfile) {
         require(profile.uid.isNotBlank()) { "A user profile requires a Firebase UID." }
         check(isFirebaseConfigured) { "Firebase is not configured for this build." }

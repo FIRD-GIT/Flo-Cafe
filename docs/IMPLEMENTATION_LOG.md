@@ -63,3 +63,13 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Validation:** The project is configured to build without `google-services.json`; Firestore rules require Firebase Emulator Suite or a configured project for runtime verification.
 - **Known limitations:** authentication screens, admin navigation, Firebase project configuration, and emulator evidence are follow-up work.
 - **Commit reference:** to be added after validation.
+
+## 2026-11-04 — Authentication entry flow
+
+- **Status:** Implemented; live Firebase testing remains pending until project configuration is supplied.
+- **Requirement links:** PRD FR-01, FR-02; CAFE-01, CAFE-02.
+- **Purpose and user value:** provide the first usable account entry point for customers and establish the role lookup used by later navigation.
+- **Code location:** `MainActivity.kt`, `UserRepository.kt`, `activity_main.xml`, and `strings.xml`.
+- **Code-to-screen translation:** the launcher shows email/password controls and sign-in/registration actions when Firebase is configured. Without configuration, the same controls remain visible but disabled with an explicit setup message.
+- **Validation:** debug build and emulator launch verified; live account creation and role lookup require `google-services.json` and Firebase Authentication.
+- **Known limitations:** admin assignment remains a trusted Firestore operation; customer navigation and logout are follow-up work.

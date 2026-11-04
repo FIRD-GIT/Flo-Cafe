@@ -54,3 +54,4 @@ Future entries should include:
 
 - Made Google Services integration conditional on `app/google-services.json`, so the Android project remains buildable before Firebase project setup while enabling live Firebase configuration automatically once the file is added.
 - Aligned AndroidX and Firebase dependency versions with the project's compile SDK 33 requirement so the debug build can validate without requiring a newer SDK.
+- Added the first authentication flow: customer registration, email/password sign-in, persisted customer profiles, and role-aware status messaging.
