@@ -123,3 +123,13 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Code-to-screen translation:** the configured app can now authenticate users, create protected profiles, submit customer-owned orders, and expose admin-only status operations when the live accounts exist.
 - **Validation:** the Android build has passed with Google Services processing; the remaining evidence is a manual customer/admin end-to-end test in the emulator.
 - **Known limitations:** no live account credentials or screenshots are stored in the repository.
+
+## 2026-11-04 — Separate authenticated pages
+
+- **Status:** Implemented; live role navigation still requires the configured test accounts.
+- **Requirement links:** PRD FR-01, FR-02, FR-03, FR-14; CAFE-01, CAFE-02, CAFE-04, CAFE-15.
+- **Purpose and user value:** keep authentication separate from the actual customer and sub-admin workflows so users see a normal post-login page rather than a combined login/menu screen.
+- **Code location:** `MainActivity.kt`, `CustomerActivity.kt`, `AdminActivity.kt`, their XML layouts, and `AndroidManifest.xml`.
+- **Code-to-screen translation:** successful authentication and restored sessions now open a customer menu page or admin orders page. Each role has its own logout action that returns to the authentication page.
+- **Validation:** debug build, emulator installation, and role navigation must be verified after this change.
+- **Known limitations:** visual styling remains intentionally basic; the focus is workflow separation.

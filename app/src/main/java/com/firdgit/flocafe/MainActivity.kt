@@ -1,9 +1,9 @@
 package com.firdgit.flocafe
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -15,13 +15,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var emailInput: EditText
     private lateinit var passwordInput: EditText
     private lateinit var displayNameInput: EditText
-    private lateinit var landingText: TextView
     private lateinit var userRepository: UserRepository
-    private lateinit var orderRepository: OrderRepository
-    private lateinit var menuContainer: LinearLayout
-    private lateinit var basketText: TextView
-    private lateinit var ordersText: TextView
-    private val basket = mutableMapOf<String, BasketLine>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,15 +25,9 @@ class MainActivity : AppCompatActivity() {
         emailInput = findViewById(R.id.emailInput)
         passwordInput = findViewById(R.id.passwordInput)
         displayNameInput = findViewById(R.id.displayNameInput)
-        landingText = findViewById(R.id.landingText)
-        menuContainer = findViewById(R.id.menuContainer)
-        basketText = findViewById(R.id.basketText)
-        ordersText = findViewById(R.id.ordersText)
         userRepository = UserRepository(this)
-        orderRepository = OrderRepository(userRepository)
 
-        val firebaseConfigured = userRepository.isFirebaseConfigured
-        if (!firebaseConfigured) {
+        if (!userRepository.isFirebaseConfigured) {
             roleText.text = getString(R.string.firebase_configuration_required)
             statusText.text = getString(R.string.firebase_setup_hint)
             setAuthenticationEnabled(false)
@@ -47,7 +35,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.signInButton).setOnClickListener {
-            authenticate { userRepository.signIn(emailInput.text.toString(), passwordInput.text.toString()) }
+            authenticate {
+                userRepository.signIn(emailInput.text.toString(), passwordInput.text.toString())
+            }
         }
         findViewById<Button>(R.id.registerButton).setOnClickListener {
             authenticate {
@@ -58,13 +48,10 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+
         roleText.text = getString(R.string.role_loading)
         lifecycleScope.launch {
-            when (userRepository.currentUserRole()) {
-                UserRole.ADMIN -> showAuthenticatedState(UserRole.ADMIN)
-                UserRole.CUSTOMER -> showAuthenticatedState(UserRole.CUSTOMER)
-                null -> showSignedOutState()
-            }
+            routeToRole(userRepository.currentUserRole())
         }
     }
 
@@ -72,198 +59,28 @@ class MainActivity : AppCompatActivity() {
         statusText.text = getString(R.string.authentication_in_progress)
         lifecycleScope.launch {
             runCatching { action() }
-                .onSuccess { role ->
-                    showAuthenticatedState(role)
-                }
+                .onSuccess { role -> routeToRole(role) }
                 .onFailure { error ->
                     statusText.text = error.message ?: getString(R.string.authentication_failed)
                 }
         }
     }
 
-    private fun showAuthenticatedState(role: UserRole) {
-        roleText.text = if (role == UserRole.ADMIN) {
-            getString(R.string.role_admin)
-        } else {
-            getString(R.string.role_customer)
-        }
-        landingText.text = if (role == UserRole.ADMIN) {
-            getString(R.string.admin_landing_message)
-        } else {
-            getString(R.string.customer_landing_message)
-        }
-        statusText.text = getString(
-            R.string.authentication_success_for_user,
-            userRepository.currentUserEmail.orEmpty(),
-        )
-        setAuthenticationEnabled(false)
-        if (role == UserRole.CUSTOMER) {
-            showCustomerMenu()
-            loadCustomerOrders()
-        } else {
-            showAdminOrders()
-        }
-        findViewById<Button>(R.id.logoutButton).apply {
-            isEnabled = true
-            setOnClickListener {
-                userRepository.signOut()
-                showSignedOutState()
+    private fun routeToRole(role: UserRole?) {
+        when (role) {
+            UserRole.ADMIN -> openRoleActivity(AdminActivity::class.java)
+            UserRole.CUSTOMER -> openRoleActivity(CustomerActivity::class.java)
+            null -> {
+                roleText.text = getString(R.string.authentication_required)
+                statusText.text = getString(R.string.signed_out_message)
             }
         }
     }
 
-    private fun showSignedOutState() {
-        roleText.text = getString(R.string.authentication_required)
-        landingText.text = getString(R.string.signed_out_landing_message)
-        statusText.text = getString(R.string.signed_out_message)
-        setAuthenticationEnabled(true)
-        findViewById<Button>(R.id.logoutButton).isEnabled = false
-        menuContainer.removeAllViews()
-        menuContainer.visibility = LinearLayout.GONE
-        basketText.visibility = TextView.GONE
-        findViewById<Button>(R.id.checkoutButton).visibility = Button.GONE
-        ordersText.visibility = TextView.GONE
+    private fun openRoleActivity(activityClass: Class<out AppCompatActivity>) {
+        startActivity(Intent(this, activityClass))
+        finish()
     }
-
-    private fun showCustomerMenu() {
-        menuContainer.visibility = LinearLayout.VISIBLE
-        basketText.visibility = TextView.VISIBLE
-        findViewById<Button>(R.id.checkoutButton).apply {
-            visibility = Button.VISIBLE
-            setOnClickListener {
-                if (basket.isEmpty()) {
-                    statusText.text = getString(R.string.empty_basket)
-                    return@setOnClickListener
-                }
-                statusText.text = getString(R.string.order_submitting)
-                lifecycleScope.launch {
-                    runCatching { orderRepository.submitOrder(basket.values.toList()) }
-                        .onSuccess { orderId ->
-                            basket.clear()
-                            updateBasketText()
-                            statusText.text = getString(R.string.order_submitted, orderId)
-                        }
-                        .onFailure { error ->
-                            statusText.text = error.message ?: getString(R.string.order_failed)
-                        }
-                }
-            }
-        }
-        menuContainer.removeAllViews()
-        MenuRepository().availableItems().forEach { item ->
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                setPadding(0, 12, 0, 12)
-            }
-            val itemText = TextView(this).apply {
-                text = getString(R.string.menu_item_format, item.name, item.description, item.price)
-                textSize = 16f
-            }
-            val addButton = Button(this).apply {
-                text = getString(R.string.add_to_basket)
-                setOnClickListener {
-                    val line = basket[item.id]
-                    if (line == null) {
-                        basket[item.id] = BasketLine(item, 1)
-                    } else {
-                        line.quantity += 1
-                    }
-                    updateBasketText()
-                }
-            }
-            row.addView(itemText)
-            row.addView(addButton)
-            menuContainer.addView(row)
-        }
-        updateBasketText()
-    }
-
-    private fun loadCustomerOrders() {
-        ordersText.visibility = TextView.VISIBLE
-        lifecycleScope.launch {
-            runCatching { orderRepository.currentCustomerOrders() }
-                .onSuccess { orders ->
-                    ordersText.text = if (orders.isEmpty()) {
-                        getString(R.string.no_orders)
-                    } else {
-                        getString(
-                            R.string.current_orders,
-                            orders.joinToString("\n") {
-                                getString(R.string.order_summary, it.id, it.status, it.total)
-                            },
-                        )
-                    }
-                }
-                .onFailure { error ->
-                    ordersText.text = error.message ?: getString(R.string.orders_failed)
-                }
-        }
-    }
-
-    private fun showAdminOrders() {
-        menuContainer.removeAllViews()
-        menuContainer.visibility = LinearLayout.GONE
-        basketText.visibility = TextView.GONE
-        findViewById<Button>(R.id.checkoutButton).visibility = Button.GONE
-        ordersText.visibility = TextView.VISIBLE
-        lifecycleScope.launch {
-            runCatching { orderRepository.allOrders() }
-                .onSuccess { orders ->
-                    ordersText.text = if (orders.isEmpty()) {
-                        getString(R.string.no_orders)
-                    } else {
-                        getString(
-                            R.string.admin_orders,
-                            orders.joinToString("\n") {
-                                getString(R.string.order_summary, it.id, it.status, it.total)
-                            },
-                        )
-                    }
-                    menuContainer.visibility = LinearLayout.VISIBLE
-                    orders.forEach { order ->
-                        addStatusButton(order)
-                    }
-                }
-                .onFailure { error ->
-                    ordersText.text = error.message ?: getString(R.string.no_orders)
-                }
-        }
-    }
-
-    private fun addStatusButton(order: OrderRepository.OrderSummary) {
-        val button = Button(this).apply {
-            text = getString(R.string.advance_order, order.id)
-            setOnClickListener {
-                val nextStatus = when (order.status) {
-                    "Pending" -> "Preparing"
-                    "Preparing" -> "Ready for Collection"
-                    "Ready for Collection" -> "Collected"
-                    else -> "Collected"
-                }
-                lifecycleScope.launch {
-                    runCatching { orderRepository.updateStatus(order.id, nextStatus) }
-                        .onSuccess {
-                            statusText.text = getString(R.string.status_updated, nextStatus)
-                            showAdminOrders()
-                        }
-                        .onFailure { error ->
-                            statusText.text = error.message ?: getString(R.string.status_update_failed)
-                        }
-                }
-            }
-        }
-        menuContainer.addView(button)
-    }
-
-    private fun updateBasketText() {
-        basketText.text = if (basket.isEmpty()) {
-            getString(R.string.basket_empty)
-        } else {
-            getString(R.string.basket_summary, basket.values.sumOf { it.quantity }, basketTotal())
-        }
-    }
-
-    private fun basketTotal(): String = "%.2f".format(basket.values.sumOf { it.item.price * it.quantity })
 
     private fun setAuthenticationEnabled(enabled: Boolean) {
         emailInput.isEnabled = enabled

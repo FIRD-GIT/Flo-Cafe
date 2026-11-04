@@ -28,14 +28,6 @@
         android:layout_marginTop="12dp"
         android:text="@string/welcome_message" />
 
-    <TextView
-        android:id="@+id/landingText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/signed_out_landing_message"
-        android:textStyle="bold" />
-
     <EditText
         android:id="@+id/displayNameInput"
         android:layout_width="match_parent"
@@ -70,50 +62,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/register_customer" />
-
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/sign_out"
-        android:enabled="false" />
-
-    <TextView
-        android:id="@+id/basketText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/basket_empty"
-        android:textStyle="bold"
-        android:visibility="gone" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:id="@+id/menuContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone" />
-    </ScrollView>
-
-    <Button
-        android:id="@+id/checkoutButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/checkout_preview_button"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/ordersText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/no_orders"
-        android:textStyle="bold"
-        android:visibility="gone" />
 </LinearLayout>

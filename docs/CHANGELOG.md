@@ -59,3 +59,4 @@ Future entries should include:
 - Added the first customer ordering slice with controlled menu data, add-to-basket actions, live totals, and checkout preview.
 - Added Firestore order submission with customer ownership rules, pending status, immutable item snapshots, and failure feedback.
 - Added customer order tracking and admin-only controlled status progression through Pending, Preparing, Ready for Collection, and Collected.
+- Split authentication, customer ordering, and admin order management into separate Android pages.
