@@ -113,3 +113,13 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Code-to-screen translation:** customers see their order references, totals, and statuses; sub-admins see incoming orders and can advance each order through the controlled status list.
 - **Validation:** debug build and emulator installation are required after this change; live role and rules testing remains pending Firebase Console activation.
 - **Known limitations:** coffee-cup visual progress, notifications, previous-order suggestions, and AI analysis remain follow-up work.
+
+## 2026-11-04 — Firebase Console validation
+
+- **Status:** Firebase Authentication Email/Password and Firestore setup completed by the project owner; live account and order-flow evidence remains to be captured.
+- **Requirement links:** PRD NFR-03, NFR-04, NFR-08; CAFE-13, CAFE-14, CAFE-18.
+- **Purpose and user value:** move the application from build-only Firebase integration to a real project with enforceable authentication and Firestore rules.
+- **Code location:** `app/google-services.json` (local/ignored), `firestore.rules`, `docs/CODE_JUSTIFICATION.md`.
+- **Code-to-screen translation:** the configured app can now authenticate users, create protected profiles, submit customer-owned orders, and expose admin-only status operations when the live accounts exist.
+- **Validation:** the Android build has passed with Google Services processing; the remaining evidence is a manual customer/admin end-to-end test in the emulator.
+- **Known limitations:** no live account credentials or screenshots are stored in the repository.

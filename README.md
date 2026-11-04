@@ -22,6 +22,7 @@ The current milestone is intentionally limited to requirements and project found
 | `docs/decisions/` | Architecture and technical decision records |
 | `docs/testing/` | Test plans and evidence added during implementation |
 | `docs/GENAI_USAGE.md` | Truthful record of any generative-AI assistance |
+| `docs/CODE_JUSTIFICATION.md` | Plain-language explanation of the main implementation and Firestore security decisions |
 | `app/` | Android application source, to be added in the implementation milestone |
 
 ## Coursework alignment
