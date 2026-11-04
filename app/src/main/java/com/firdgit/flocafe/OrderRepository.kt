@@ -9,6 +9,12 @@ class OrderRepository(
 ) {
     private val firestore = FirebaseFirestore.getInstance()
 
+    data class OrderSummary(
+        val id: String,
+        val status: String,
+        val total: Double,
+    )
+
     suspend fun submitOrder(lines: List<BasketLine>): String {
         require(lines.isNotEmpty()) { "Add an item before checkout." }
         check(userRepository.isFirebaseConfigured) { "Firebase is not configured for this build." }
@@ -34,5 +40,47 @@ class OrderRepository(
             ),
         ).await()
         return order.id
+    }
+
+    suspend fun currentCustomerOrders(): List<OrderSummary> {
+        check(userRepository.isFirebaseConfigured) { "Firebase is not configured for this build." }
+        val customerUid = requireNotNull(userRepository.currentUserId) {
+            "Sign in before loading orders."
+        }
+        return firestore.collection("orders")
+            .whereEqualTo("customerUid", customerUid)
+            .get()
+            .await()
+            .documents
+            .map { document ->
+                OrderSummary(
+                    id = document.id,
+                    status = document.getString("status").orEmpty(),
+                    total = document.getDouble("total") ?: 0.0,
+                )
+            }
+    }
+
+    suspend fun allOrders(): List<OrderSummary> {
+        check(userRepository.isFirebaseConfigured) { "Firebase is not configured for this build." }
+        return firestore.collection("orders")
+            .get()
+            .await()
+            .documents
+            .map { document ->
+                OrderSummary(
+                    id = document.id,
+                    status = document.getString("status").orEmpty(),
+                    total = document.getDouble("total") ?: 0.0,
+                )
+            }
+    }
+
+    suspend fun updateStatus(orderId: String, status: String) {
+        require(status in setOf("Pending", "Preparing", "Ready for Collection", "Collected")) {
+            "Unsupported order status."
+        }
+        check(userRepository.isFirebaseConfigured) { "Firebase is not configured for this build." }
+        firestore.collection("orders").document(orderId).update("status", status).await()
     }
 }

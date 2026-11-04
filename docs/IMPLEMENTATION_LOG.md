@@ -103,3 +103,13 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Code-to-screen translation:** Submit order validates the basket, writes a customer-owned pending order with item snapshots and total, clears the basket only after success, and shows a recoverable error on failure.
 - **Validation:** debug build and emulator installation are required after this change; live persistence requires Firebase Console setup and deployed rules.
 - **Known limitations:** order status updates, customer order history, and admin controls are follow-up work.
+
+## 2026-11-04 — Order tracking and admin status controls
+
+- **Status:** Implemented; live validation requires Firebase Authentication, Firestore, and deployed rules.
+- **Requirement links:** PRD FR-08, FR-14, FR-15; CAFE-08, CAFE-15, CAFE-16.
+- **Purpose and user value:** connect customer order visibility to the limited sub-admin workflow needed for the Thursday demonstration.
+- **Code location:** `OrderRepository.kt`, `MainActivity.kt`, `activity_main.xml`, and `firestore.rules`.
+- **Code-to-screen translation:** customers see their order references, totals, and statuses; sub-admins see incoming orders and can advance each order through the controlled status list.
+- **Validation:** debug build and emulator installation are required after this change; live role and rules testing remains pending Firebase Console activation.
+- **Known limitations:** coffee-cup visual progress, notifications, previous-order suggestions, and AI analysis remain follow-up work.

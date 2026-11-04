@@ -31,4 +31,12 @@
     <string name="order_submitting">Submitting order…</string>
     <string name="order_submitted">Order %1$s submitted. Status: Pending.</string>
     <string name="order_failed">Order could not be submitted.</string>
+    <string name="no_orders">No orders found.</string>
+    <string name="orders_failed">Orders could not be loaded.</string>
+    <string name="current_orders">Your orders:\n%1$s</string>
+    <string name="admin_orders">Incoming orders:\n%1$s</string>
+    <string name="order_summary">Order %1$s · %2$s · £%3$.2f</string>
+    <string name="advance_order">Advance order %1$s</string>
+    <string name="status_updated">Order status updated to %1$s.</string>
+    <string name="status_update_failed">Order status could not be updated.</string>
 </resources>

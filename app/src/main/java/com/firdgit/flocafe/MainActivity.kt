@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var orderRepository: OrderRepository
     private lateinit var menuContainer: LinearLayout
     private lateinit var basketText: TextView
+    private lateinit var ordersText: TextView
     private val basket = mutableMapOf<String, BasketLine>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         landingText = findViewById(R.id.landingText)
         menuContainer = findViewById(R.id.menuContainer)
         basketText = findViewById(R.id.basketText)
+        ordersText = findViewById(R.id.ordersText)
         userRepository = UserRepository(this)
         orderRepository = OrderRepository(userRepository)
 
@@ -97,11 +99,9 @@ class MainActivity : AppCompatActivity() {
         setAuthenticationEnabled(false)
         if (role == UserRole.CUSTOMER) {
             showCustomerMenu()
+            loadCustomerOrders()
         } else {
-            menuContainer.removeAllViews()
-            menuContainer.visibility = LinearLayout.GONE
-            basketText.visibility = TextView.GONE
-            findViewById<Button>(R.id.checkoutButton).visibility = Button.GONE
+            showAdminOrders()
         }
         findViewById<Button>(R.id.logoutButton).apply {
             isEnabled = true
@@ -122,6 +122,7 @@ class MainActivity : AppCompatActivity() {
         menuContainer.visibility = LinearLayout.GONE
         basketText.visibility = TextView.GONE
         findViewById<Button>(R.id.checkoutButton).visibility = Button.GONE
+        ordersText.visibility = TextView.GONE
     }
 
     private fun showCustomerMenu() {
@@ -175,6 +176,83 @@ class MainActivity : AppCompatActivity() {
             menuContainer.addView(row)
         }
         updateBasketText()
+    }
+
+    private fun loadCustomerOrders() {
+        ordersText.visibility = TextView.VISIBLE
+        lifecycleScope.launch {
+            runCatching { orderRepository.currentCustomerOrders() }
+                .onSuccess { orders ->
+                    ordersText.text = if (orders.isEmpty()) {
+                        getString(R.string.no_orders)
+                    } else {
+                        getString(
+                            R.string.current_orders,
+                            orders.joinToString("\n") {
+                                getString(R.string.order_summary, it.id, it.status, it.total)
+                            },
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    ordersText.text = error.message ?: getString(R.string.orders_failed)
+                }
+        }
+    }
+
+    private fun showAdminOrders() {
+        menuContainer.removeAllViews()
+        menuContainer.visibility = LinearLayout.GONE
+        basketText.visibility = TextView.GONE
+        findViewById<Button>(R.id.checkoutButton).visibility = Button.GONE
+        ordersText.visibility = TextView.VISIBLE
+        lifecycleScope.launch {
+            runCatching { orderRepository.allOrders() }
+                .onSuccess { orders ->
+                    ordersText.text = if (orders.isEmpty()) {
+                        getString(R.string.no_orders)
+                    } else {
+                        getString(
+                            R.string.admin_orders,
+                            orders.joinToString("\n") {
+                                getString(R.string.order_summary, it.id, it.status, it.total)
+                            },
+                        )
+                    }
+                    menuContainer.visibility = LinearLayout.VISIBLE
+                    orders.forEach { order ->
+                        addStatusButton(order)
+                    }
+                }
+                .onFailure { error ->
+                    ordersText.text = error.message ?: getString(R.string.no_orders)
+                }
+        }
+    }
+
+    private fun addStatusButton(order: OrderRepository.OrderSummary) {
+        val button = Button(this).apply {
+            text = getString(R.string.advance_order, order.id)
+            setOnClickListener {
+                val nextStatus = when (order.status) {
+                    "Pending" -> "Preparing"
+                    "Preparing" -> "Ready for Collection"
+                    "Ready for Collection" -> "Collected"
+                    else -> "Collected"
+                }
+                lifecycleScope.launch {
+                    runCatching { orderRepository.updateStatus(order.id, nextStatus) }
+                        .onSuccess {
+                            statusText.text = getString(R.string.status_updated, nextStatus)
+                            showAdminOrders()
+                        }
+                        .onFailure { error ->
+                            statusText.text = error.message ?: getString(R.string.status_update_failed)
+                        }
+                }
+            }
+        }
+        menuContainer.addView(button)
     }
 
     private fun updateBasketText() {

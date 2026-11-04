@@ -58,3 +58,4 @@ Future entries should include:
 - Added session restoration, sign-out, and explicit customer/sub-admin landing states for the Thursday demonstration flow.
 - Added the first customer ordering slice with controlled menu data, add-to-basket actions, live totals, and checkout preview.
 - Added Firestore order submission with customer ownership rules, pending status, immutable item snapshots, and failure feedback.
+- Added customer order tracking and admin-only controlled status progression through Pending, Preparing, Ready for Collection, and Collected.
