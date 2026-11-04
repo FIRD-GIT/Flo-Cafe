@@ -42,7 +42,7 @@ The current milestone is intentionally limited to requirements and project found
 
 ## Local Android Studio setup
 
-1. Open `/Users/firdab/Desktop/CafeMobileApp` in Android Studio.
+1. Open `/Users/firdab/AndroidStudioProjects/Flo-Cafe` in Android Studio.
 2. Allow Android Studio to generate or download the Gradle wrapper when prompted.
 3. Sync Gradle and run the app on an Android emulator. The app can build in offline/demo mode without Firebase configuration.
 4. To connect Firebase, add the project's `google-services.json` to `app/`. This file is intentionally ignored by Git; the Google Services plugin is enabled automatically when the file exists.

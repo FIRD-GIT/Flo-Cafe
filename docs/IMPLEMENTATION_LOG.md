@@ -60,6 +60,6 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Decision and rationale:** store `isAdmin` in each Firestore `users/{uid}` document. Missing or false values resolve to customer access; Firestore rules prevent self-promotion.
 - **Code location:** `UserProfile.kt`, `UserRepository.kt`, `MainActivity.kt`, `firestore.rules`.
 - **Code-to-screen translation:** the launcher screen checks whether Firebase is configured and shows a configuration state rather than a false connected state. Once Firebase is configured, the repository maps `isAdmin` to the application role.
-- **Validation:** Kotlin/Android build validation is pending because this checkout does not yet contain `google-services.json` or a Gradle wrapper. Firestore rules require Firebase Emulator Suite or a configured project for runtime verification.
+- **Validation:** The project is configured to build without `google-services.json`; Firestore rules require Firebase Emulator Suite or a configured project for runtime verification.
 - **Known limitations:** authentication screens, admin navigation, Firebase project configuration, and emulator evidence are follow-up work.
 - **Commit reference:** to be added after validation.
