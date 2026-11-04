@@ -51,3 +51,15 @@ Each feature entry should explain:
 ## Feature entries
 
 Add dated entries below as implementation begins. Do not mark a feature complete until the code location, visible behaviour, and validation evidence are recorded.
+
+## 2026-11-04 — Firebase user-role foundation
+
+- **Status:** Foundation implemented; Firebase project configuration and emulator verification remain pending.
+- **Requirement links:** PRD FR-01, FR-02, FR-14; CAFE-01, CAFE-02, CAFE-03, CAFE-15, CAFE-18.
+- **Purpose and user value:** establish the persisted user identity and admin boundary needed before customer and sub-admin features are built.
+- **Decision and rationale:** store `isAdmin` in each Firestore `users/{uid}` document. Missing or false values resolve to customer access; Firestore rules prevent self-promotion.
+- **Code location:** `UserProfile.kt`, `UserRepository.kt`, `MainActivity.kt`, `firestore.rules`.
+- **Code-to-screen translation:** the launcher screen checks whether Firebase is configured and shows a configuration state rather than a false connected state. Once Firebase is configured, the repository maps `isAdmin` to the application role.
+- **Validation:** Kotlin/Android build validation is pending because this checkout does not yet contain `google-services.json` or a Gradle wrapper. Firestore rules require Firebase Emulator Suite or a configured project for runtime verification.
+- **Known limitations:** authentication screens, admin navigation, Firebase project configuration, and emulator evidence are follow-up work.
+- **Commit reference:** to be added after validation.

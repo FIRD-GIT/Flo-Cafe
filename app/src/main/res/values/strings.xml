@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Flo Cafe</string>
+    <string name="welcome_title">Flo Cafe</string>
+    <string name="welcome_message">Firebase user-role foundation ready.</string>
+    <string name="role_loading">Checking account role…</string>
+    <string name="role_customer">Customer access</string>
+    <string name="role_admin">Sub-admin access</string>
+    <string name="firebase_configuration_required">Add google-services.json to connect Firebase.</string>
+</resources>

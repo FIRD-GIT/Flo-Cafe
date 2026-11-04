@@ -36,3 +36,17 @@ Future entries should include:
 - Decision and implementation summary
 - Tests/evidence
 - Commit or pull request reference
+
+## 2026-11-04
+
+### Added
+
+- Added the initial Android application foundation using Kotlin, XML layouts, AndroidX, and compileSdk 33.
+- Added the Firebase user profile model with an `isAdmin` boolean and role mapping to `ADMIN` or `CUSTOMER`.
+- Added Firestore rules that prevent users from self-promoting to admin.
+- Added a visible Firebase configuration state so the app does not claim Firebase is connected before `google-services.json` is supplied.
+
+### Evidence
+
+- Backlog: CAFE-01, CAFE-02, CAFE-03, CAFE-13, CAFE-15, CAFE-18.
+- Source: `app/src/main/java/com/firdgit/flocafe/UserProfile.kt`, `UserRepository.kt`, and `firestore.rules`.

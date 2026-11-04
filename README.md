@@ -39,3 +39,11 @@ The current milestone is intentionally limited to requirements and project found
 3. Record tutor feedback only in `docs/CLIENT_MEETINGS.md` after the meeting has happened.
 4. Link significant requirement changes to a backlog item and a commit or pull request.
 5. Review and understand all code before using it in assessed work.
+
+## Local Android Studio setup
+
+1. Open `/Users/firdab/Desktop/CafeMobileApp` in Android Studio.
+2. Allow Android Studio to generate or download the Gradle wrapper when prompted.
+3. Add the Firebase project's `google-services.json` to `app/`. This file is intentionally ignored by Git.
+4. Sync Gradle and run the app on an Android emulator.
+5. Deploy `firestore.rules` to the Firebase project or run them in the Firebase Emulator Suite before testing role access.
