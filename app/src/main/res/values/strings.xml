@@ -22,4 +22,11 @@
     <string name="sign_in">Sign in</string>
     <string name="register_customer">Register customer</string>
     <string name="sign_out">Sign out</string>
+    <string name="menu_item_format">%1$s\n%2$s\n£%3$.2f</string>
+    <string name="add_to_basket">Add to basket</string>
+    <string name="basket_empty">Basket is empty.</string>
+    <string name="basket_summary">Basket: %1$d item(s) · Total £%2$s</string>
+    <string name="empty_basket">Add an item before checkout.</string>
+    <string name="checkout_preview_button">Preview checkout</string>
+    <string name="checkout_preview">Checkout preview ready for £%1$s. Order persistence is the next step.</string>
 </resources>

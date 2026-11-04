@@ -83,3 +83,13 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Code-to-screen translation:** an existing Firebase session is restored on launch, the user sees the role-specific landing message, and sign-out returns to the unauthenticated state.
 - **Validation:** debug build and emulator launch verified; role-specific live validation requires Firebase accounts and Firestore data.
 - **Known limitations:** full customer menu and sub-admin order controls are the next feature slice.
+
+## 2026-11-04 — Customer menu and basket preview
+
+- **Status:** Implemented; Firebase-backed menu and order persistence remain follow-up work.
+- **Requirement links:** PRD FR-03, FR-05, FR-06; CAFE-04, CAFE-06, CAFE-07.
+- **Purpose and user value:** demonstrate the core customer ordering interaction before introducing checkout persistence.
+- **Code location:** `MenuItem.kt`, `MenuRepository.kt`, `MainActivity.kt`, and `activity_main.xml`.
+- **Code-to-screen translation:** authenticated customers see available products, add items to a basket, receive a recalculated quantity/total, and can open a checkout preview. Admins do not receive customer ordering controls.
+- **Validation:** debug build and emulator installation are required after this change; live Firebase menu/order persistence is not yet implemented.
+- **Known limitations:** menu data is controlled local demo data; checkout does not yet create a Firestore order.

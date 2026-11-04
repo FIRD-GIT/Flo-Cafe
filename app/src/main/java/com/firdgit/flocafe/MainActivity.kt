@@ -3,6 +3,7 @@ package com.firdgit.flocafe
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var displayNameInput: EditText
     private lateinit var landingText: TextView
     private lateinit var userRepository: UserRepository
+    private lateinit var menuContainer: LinearLayout
+    private lateinit var basketText: TextView
+    private val basket = mutableMapOf<String, BasketLine>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         passwordInput = findViewById(R.id.passwordInput)
         displayNameInput = findViewById(R.id.displayNameInput)
         landingText = findViewById(R.id.landingText)
+        menuContainer = findViewById(R.id.menuContainer)
+        basketText = findViewById(R.id.basketText)
         userRepository = UserRepository(this)
 
         val firebaseConfigured = userRepository.isFirebaseConfigured
@@ -87,6 +93,14 @@ class MainActivity : AppCompatActivity() {
             userRepository.currentUserEmail.orEmpty(),
         )
         setAuthenticationEnabled(false)
+        if (role == UserRole.CUSTOMER) {
+            showCustomerMenu()
+        } else {
+            menuContainer.removeAllViews()
+            menuContainer.visibility = LinearLayout.GONE
+            basketText.visibility = TextView.GONE
+            findViewById<Button>(R.id.checkoutButton).visibility = Button.GONE
+        }
         findViewById<Button>(R.id.logoutButton).apply {
             isEnabled = true
             setOnClickListener {
@@ -102,7 +116,63 @@ class MainActivity : AppCompatActivity() {
         statusText.text = getString(R.string.signed_out_message)
         setAuthenticationEnabled(true)
         findViewById<Button>(R.id.logoutButton).isEnabled = false
+        menuContainer.removeAllViews()
+        menuContainer.visibility = LinearLayout.GONE
+        basketText.visibility = TextView.GONE
+        findViewById<Button>(R.id.checkoutButton).visibility = Button.GONE
     }
+
+    private fun showCustomerMenu() {
+        menuContainer.visibility = LinearLayout.VISIBLE
+        basketText.visibility = TextView.VISIBLE
+        findViewById<Button>(R.id.checkoutButton).apply {
+            visibility = Button.VISIBLE
+            setOnClickListener {
+                statusText.text = if (basket.isEmpty()) {
+                    getString(R.string.empty_basket)
+                } else {
+                    getString(R.string.checkout_preview, basketTotal())
+                }
+            }
+        }
+        menuContainer.removeAllViews()
+        MenuRepository().availableItems().forEach { item ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, 12, 0, 12)
+            }
+            val itemText = TextView(this).apply {
+                text = getString(R.string.menu_item_format, item.name, item.description, item.price)
+                textSize = 16f
+            }
+            val addButton = Button(this).apply {
+                text = getString(R.string.add_to_basket)
+                setOnClickListener {
+                    val line = basket[item.id]
+                    if (line == null) {
+                        basket[item.id] = BasketLine(item, 1)
+                    } else {
+                        line.quantity += 1
+                    }
+                    updateBasketText()
+                }
+            }
+            row.addView(itemText)
+            row.addView(addButton)
+            menuContainer.addView(row)
+        }
+        updateBasketText()
+    }
+
+    private fun updateBasketText() {
+        basketText.text = if (basket.isEmpty()) {
+            getString(R.string.basket_empty)
+        } else {
+            getString(R.string.basket_summary, basket.values.sumOf { it.quantity }, basketTotal())
+        }
+    }
+
+    private fun basketTotal(): String = "%.2f".format(basket.values.sumOf { it.item.price * it.quantity })
 
     private fun setAuthenticationEnabled(enabled: Boolean) {
         emailInput.isEnabled = enabled

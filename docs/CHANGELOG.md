@@ -56,3 +56,4 @@ Future entries should include:
 - Aligned AndroidX and Firebase dependency versions with the project's compile SDK 33 requirement so the debug build can validate without requiring a newer SDK.
 - Added the first authentication flow: customer registration, email/password sign-in, persisted customer profiles, and role-aware status messaging.
 - Added session restoration, sign-out, and explicit customer/sub-admin landing states for the Thursday demonstration flow.
+- Added the first customer ordering slice with controlled menu data, add-to-basket actions, live totals, and checkout preview.
