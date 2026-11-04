@@ -26,8 +26,11 @@ class UserRepository(
         if (!isFirebaseConfigured) return null
         val uid = auth.currentUser?.uid ?: return null
         val snapshot = firestore.collection("users").document(uid).get().await()
-        val profile = snapshot.toObject(UserProfile::class.java) ?: return UserRole.CUSTOMER
-        return if (profile.isAdmin) UserRole.ADMIN else UserRole.CUSTOMER
+        return if (snapshot.getBoolean("isAdmin") == true) {
+            UserRole.ADMIN
+        } else {
+            UserRole.CUSTOMER
+        }
     }
 
     suspend fun currentUserDisplayName(): String? {
