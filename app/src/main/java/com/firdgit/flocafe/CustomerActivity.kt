@@ -29,8 +29,18 @@ class CustomerActivity : AppCompatActivity() {
         orderRepository = OrderRepository(userRepository)
 
         findViewById<Button>(R.id.logoutButton).setOnClickListener { signOut() }
+        loadCustomerGreeting()
         showCustomerMenu()
         loadCustomerOrders()
+    }
+
+    private fun loadCustomerGreeting() {
+        lifecycleScope.launch {
+            val displayName = runCatching { userRepository.currentUserDisplayName() }
+                .getOrNull()
+                ?: getString(R.string.default_customer_name)
+            statusText.text = getString(R.string.customer_welcome_message, displayName)
+        }
     }
 
     private fun showCustomerMenu() {

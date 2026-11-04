@@ -30,6 +30,16 @@ class UserRepository(
         return if (profile.isAdmin) UserRole.ADMIN else UserRole.CUSTOMER
     }
 
+    suspend fun currentUserDisplayName(): String? {
+        if (!isFirebaseConfigured) return null
+        val uid = auth.currentUser?.uid ?: return null
+        val snapshot = firestore.collection("users").document(uid).get().await()
+        return snapshot.toObject(UserProfile::class.java)
+            ?.displayName
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+    }
+
     suspend fun signIn(email: String, password: String): UserRole {
         require(email.isNotBlank()) { "Email is required." }
         require(password.isNotBlank()) { "Password is required." }

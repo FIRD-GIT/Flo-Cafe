@@ -16,7 +16,9 @@
     <string name="authentication_failed">Authentication failed.</string>
     <string name="signed_out_message">No account is signed in.</string>
     <string name="signed_out_landing_message">Sign in to open the customer or sub-admin area.</string>
-    <string name="customer_landing_message">Customer area ready: menu and basket are the next workflow.</string>
+    <string name="customer_landing_message">Welcome to Flo Cafe.</string>
+    <string name="customer_welcome_message">Welcome %1$s to Flo Cafe.</string>
+    <string name="default_customer_name">Customer</string>
     <string name="admin_landing_message">Sub-admin area ready: order and menu controls are restricted to admins.</string>
     <string name="display_name_hint">Display name (registration only)</string>
     <string name="email_hint">Email address</string>
