@@ -14,6 +14,16 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /orders/{orderId} {
+      allow create: if request.auth != null
+        && request.resource.data.customerUid == request.auth.uid
+        && request.resource.data.status == "Pending";
+      allow read: if request.auth != null
+        && (resource.data.customerUid == request.auth.uid || isAdmin());
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
     function isAdmin() {
       return request.auth != null
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;

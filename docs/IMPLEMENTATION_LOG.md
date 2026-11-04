@@ -93,3 +93,13 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Code-to-screen translation:** authenticated customers see available products, add items to a basket, receive a recalculated quantity/total, and can open a checkout preview. Admins do not receive customer ordering controls.
 - **Validation:** debug build and emulator installation are required after this change; live Firebase menu/order persistence is not yet implemented.
 - **Known limitations:** menu data is controlled local demo data; checkout does not yet create a Firestore order.
+
+## 2026-11-04 — Firestore order submission
+
+- **Status:** Implemented; live submission requires Firebase Authentication, Firestore, and deployed rules.
+- **Requirement links:** PRD FR-07, FR-08; CAFE-07, CAFE-08, CAFE-15.
+- **Purpose and user value:** allow an authenticated customer to submit a non-empty basket and receive a stable order reference.
+- **Code location:** `OrderRepository.kt`, `UserRepository.kt`, `MainActivity.kt`, and `firestore.rules`.
+- **Code-to-screen translation:** Submit order validates the basket, writes a customer-owned pending order with item snapshots and total, clears the basket only after success, and shows a recoverable error on failure.
+- **Validation:** debug build and emulator installation are required after this change; live persistence requires Firebase Console setup and deployed rules.
+- **Known limitations:** order status updates, customer order history, and admin controls are follow-up work.

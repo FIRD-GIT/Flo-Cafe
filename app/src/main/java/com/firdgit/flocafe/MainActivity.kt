@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var displayNameInput: EditText
     private lateinit var landingText: TextView
     private lateinit var userRepository: UserRepository
+    private lateinit var orderRepository: OrderRepository
     private lateinit var menuContainer: LinearLayout
     private lateinit var basketText: TextView
     private val basket = mutableMapOf<String, BasketLine>()
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         menuContainer = findViewById(R.id.menuContainer)
         basketText = findViewById(R.id.basketText)
         userRepository = UserRepository(this)
+        orderRepository = OrderRepository(userRepository)
 
         val firebaseConfigured = userRepository.isFirebaseConfigured
         if (!firebaseConfigured) {
@@ -128,10 +130,21 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.checkoutButton).apply {
             visibility = Button.VISIBLE
             setOnClickListener {
-                statusText.text = if (basket.isEmpty()) {
-                    getString(R.string.empty_basket)
-                } else {
-                    getString(R.string.checkout_preview, basketTotal())
+                if (basket.isEmpty()) {
+                    statusText.text = getString(R.string.empty_basket)
+                    return@setOnClickListener
+                }
+                statusText.text = getString(R.string.order_submitting)
+                lifecycleScope.launch {
+                    runCatching { orderRepository.submitOrder(basket.values.toList()) }
+                        .onSuccess { orderId ->
+                            basket.clear()
+                            updateBasketText()
+                            statusText.text = getString(R.string.order_submitted, orderId)
+                        }
+                        .onFailure { error ->
+                            statusText.text = error.message ?: getString(R.string.order_failed)
+                        }
                 }
             }
         }

@@ -19,6 +19,9 @@ class UserRepository(
     val currentUserEmail: String?
         get() = if (isFirebaseConfigured) auth.currentUser?.email else null
 
+    val currentUserId: String?
+        get() = if (isFirebaseConfigured) auth.currentUser?.uid else null
+
     suspend fun currentUserRole(): UserRole? {
         if (!isFirebaseConfigured) return null
         val uid = auth.currentUser?.uid ?: return null
