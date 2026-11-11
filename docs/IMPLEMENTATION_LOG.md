@@ -57,7 +57,7 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Status:** Implemented and build-verified.
 - **Requirement links:** PRD FR-03, FR-18, NFR-01; CAFE-04, CAFE-21.
 - **Purpose and user value:** improve category readability and ensure customers only see customisation choices that make sense for the selected item.
-- **Decision and rationale:** Home categories now use separated full-width rounded actions, while Menu categories use horizontally scrollable, spaced chips so long labels do not overlap. Each customisable product now declares its own groups: drinks can expose size, milk, shots, sweetness, syrup, ice or toppings; sandwiches expose preparation and ingredient choices such as extra cheese or no tomato; fixed sweet treats continue to add directly without a customisation prompt.
+- **Decision and rationale:** The first refinement used separated Home actions and spaced Menu chips so long labels did not overlap. That interim layout was superseded by the later 2×2 category grid documented below. Each customisable product declares its own groups: drinks can expose size, milk, shots, sweetness, syrup, ice or toppings; sandwiches expose preparation and ingredient choices such as extra cheese or no tomato; fixed sweet treats continue to add directly without a customisation prompt.
 - **Code location:** `MenuItem.kt`, `MenuRepository.kt`, `CustomerActivity.kt`, and `MenuRepositoryTest.kt`.
 - **Code-to-screen translation:** the product dialog is generated from the selected item's `customisationGroups`, rather than displaying irrelevant fields such as milk or espresso shots for a sandwich.
 - **Validation:** `assembleDebug` and `testDebugUnitTest` pass; emulator UI inspection confirmed the spaced category labels and expanded item-specific menu model.
@@ -119,6 +119,29 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Variability:** menu availability, quantities, customisations and preparation states can differ between orders.
 - **Visualisation:** category headings, product illustrations, quantity indicators, basket summaries and four-step cup-progress bars make data understandable to the user.
 - **Vulnerability:** customer access is limited to owned orders, admin operations are role-protected, Firebase handles passwords, and optional location/photo/AI data is not collected by this release.
+
+## 2026-11-11 — Category grid and compact customer actions
+
+- **Status:** Implemented, tested and pushed.
+- **Requirement links:** PRD FR-17, FR-21, FR-22, NFR-01, NFR-02; CAFE-19, CAFE-20, CAFE-21, CAFE-23.
+- **Purpose and user value:** remove clipped horizontal category controls, make the main customer actions easier to scan, and reduce visual crowding in the basket.
+- **Decision and rationale:** Home and Menu use a 2×2 category grid; category selection opens the Menu tab filtered to the selected section. Product cards use a primary add action with a smaller secondary customisation action. Basket rows use product thumbnails, concise detail text and a compact quantity stepper so controls support the item rather than dominating it.
+- **Code location:** `CustomerActivity.kt`, `MenuItem.kt`, `MenuRepository.kt`, and `strings.xml`.
+- **Code-to-screen translation:** category buttons are rendered in a `GridLayout`, selected categories are stored in `selectedMenuCategory`, and the Menu content is rebuilt from the matching catalogue group. Shared button helpers and spacing parameters create consistent primary, secondary and compact control treatments.
+- **Validation:** `./gradlew :app:assembleDebug :app:testDebugUnitTest --no-daemon` passed; `git diff --check` passed; the APK installed successfully on `emulator-5554`.
+- **Known limitations:** menu content and nutrition remain local coursework data; final visual judgement still depends on the target emulator dimensions.
+- **Commit reference:** `518bb4b` (`Refine customer menu spacing`).
+
+## 2026-11-11 — Basket, status and order-history spacing
+
+- **Status:** Implemented, tested and pushed.
+- **Requirement links:** PRD FR-22, NFR-01, NFR-02; CAFE-06, CAFE-08, CAFE-09, CAFE-18.
+- **Purpose and user value:** create a consistent visual rhythm across basket rows, order-status cards and Profile order history.
+- **Decision and rationale:** use explicit vertical margins between repeated cards and sections, reduce primary button height, distinguish the clear-basket action as secondary, and replace wide quantity pills with compact square controls that retain a usable touch area.
+- **Code location:** `CustomerActivity.kt`.
+- **Code-to-screen translation:** `spacedParams` establishes reusable vertical rhythm; `compactControlButton` styles quantity actions; order cards and basket rows receive explicit separation; shared title/body/button helpers preserve hierarchy across Home, Basket and Profile.
+- **Validation:** `./gradlew :app:assembleDebug :app:testDebugUnitTest --no-daemon` passed; `git diff --check` passed; the APK installed successfully on `emulator-5554`.
+- **Commit references:** `d766c46` (`Improve basket spacing and controls`) and `3c4f2b1` (`Space order history cards`).
 
 ## 2026-11-04 — Firebase user-role foundation
 

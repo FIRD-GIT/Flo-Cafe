@@ -60,3 +60,16 @@ Future entries should include:
 - Added Firestore order submission with customer ownership rules, pending status, immutable item snapshots, and failure feedback.
 - Added customer order tracking and admin-only controlled status progression through Pending, Preparing, Ready for Collection, and Collected.
 - Split authentication, customer ordering, and admin order management into separate Android pages.
+
+## 2026-11-11
+
+- Added the customer redesign with Home, Menu, Basket and Profile tabs, expanded menu categories, product imagery, item-specific customisation and labelled prototype nutrition estimates.
+- Added consistent currency formatting and direct add-to-basket behaviour for fixed sweet treats.
+- Replaced clipped category scrolling with a 2×2 category grid and category-to-filtered-menu navigation.
+- Reduced product-action and basket-control dominance, added compact basket thumbnails and concise customisation summaries, and introduced consistent spacing across basket, order-status and Profile order-history cards.
+- Updated the coursework evidence, backlog statuses, code justification and GenAI declaration to match the implemented customer experience.
+
+### Evidence
+
+- Commits: `a877530`, `106c99a`, `e7ce939`, `55b8afd`, `518bb4b`, `d766c46`, `3c4f2b1`.
+- Validation: Firebase-enabled debug build and unit tests pass; the APK installs on `emulator-5554`.

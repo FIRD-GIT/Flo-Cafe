@@ -170,6 +170,18 @@ unit price × quantity
 
 The interface updates after every add action. An empty basket cannot be submitted. This gives a visible working slice for menu browsing and basket calculation while leaving Firestore menu management as a later enhancement.
 
+### Customer experience refinements
+
+The customer surface is intentionally organised as four bottom-tab destinations: Home, Menu, Basket and Profile. `CustomerActivity.kt` owns the tab shell so the active basket remains available while each destination can present a focused task.
+
+- Home category shortcuts use a 2×2 grid so all four categories are visible without horizontal scrolling. Selecting a category stores the selected category and opens the Menu tab filtered to that section.
+- Menu products use a compact primary/secondary action pair. `Add to basket` adds the standard version directly, while `Customise` opens only for products with meaningful choices. Fixed treats such as cookies and brownies do not show an unnecessary customisation dialog.
+- Basket rows include a compact product thumbnail, a short customisation line, nutrition information and a smaller quantity stepper. Primary checkout and secondary clear actions use different visual weights.
+- Order status and profile history cards share the same spaced card treatment, with product imagery, a short customer-facing reference, item summary, status, date and total. Tapping a history card reveals the detailed item snapshots and internal Firestore reference.
+- `PriceFormatter` centralises currency presentation so fractional prices use two decimal places while whole-pound values omit redundant decimals.
+
+These choices prioritise scanability and task flow on a narrow emulator screen: category discovery, product choice, basket editing and order review are separated by deliberate spacing rather than by adding more screens or framework dependencies.
+
 ## 6. Order submission
 
 `OrderRepository.submitOrder`:
@@ -192,6 +204,8 @@ Pending → Preparing → Ready for Collection → Collected
 ```
 
 The UI restricts the visible controls by role, while `firestore.rules` provides the actual security boundary. Both layers are needed: the UI supports usability, and the rules protect the data if the client is modified or bypassed.
+
+Customer-facing status cards and Profile order history now use customer-friendly short references such as `Order #ABC123`. The full Firestore ID remains available only in the order-detail view, preserving auditability without making the technical identifier the primary visual element.
 
 ## 8. Thursday 5 November scope
 

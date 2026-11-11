@@ -1,7 +1,7 @@
 # Flo Cafe — Product Requirements Document
 
-**Version:** 1.0  
-**Status:** Draft for Lab 01 stakeholder review  
+**Version:** 1.1
+**Status:** Working customer-release specification
 **Author:** Firdaos Alesinloye Abbas  
 **Date:** 29 October 2026  
 **Course:** CTEC3703 Mobile Application Development & Big Data  
@@ -97,12 +97,12 @@ The tutor provides feedback and may request changes during weekly development. O
 
 ### Customer experience redesign
 
-The customer release is being elevated from a single-page prototype to a four-tab experience:
+The customer release has been elevated from a single-page prototype to a four-tab experience:
 
 - **Home:** personalised `Welcome, {display name}` greeting, featured/seasonal products, category shortcuts, favourites and current-order status.
-- **Menu:** four categories — Hot Drinks, Cold Drinks, Sweet Treats, and Sandwiches — with product imagery, descriptions, prices and estimated nutrition.
-- **Basket:** item imagery, full customisation summaries, quantity controls, subtotal, clear basket and checkout.
-- **Profile:** display name/email, local profile editing, order history, saved favourites, dietary preference controls and safe sign out.
+- **Menu:** four categories — Hot Drinks, Cold Drinks, Sweet Treats, and Sandwiches — displayed in a visible 2×2 category grid with shortcuts that open the selected Menu section; products include imagery, descriptions, prices and estimated nutrition.
+- **Basket:** compact item imagery, concise customisation summaries, smaller quantity controls, subtotal, clear basket and checkout.
+- **Profile:** display name/email, local profile editing, spaced order history cards with product imagery and short references, saved favourites, dietary preference controls and safe sign out.
 
 Coffee customisation includes size, milk type, espresso-shot count, temperature, sweetness, syrups, toppings and whipped cream. Nutrition figures are currently AI-assisted prototype estimates and must be labelled as unverified rather than presented as medical or official product data.
 
@@ -154,6 +154,8 @@ Completed order → rate service/products → submit feedback → confirmation.
 | FR-18 | The customer can customise supported drinks using size, milk, shots, temperature, sweetness, syrups, toppings, and whipped cream controls. | Must |
 | FR-19 | The customer can see a personalised Home greeting using their stored display name. | Should |
 | FR-20 | The customer can view clearly labelled prototype nutrition estimates for menu products. | Should |
+| FR-21 | Category shortcuts fit within the screen without horizontal scrolling and open the corresponding Menu category. | Must |
+| FR-22 | Customer-facing order cards use readable spacing, short references and compact controls while retaining detailed order information on inspection. | Should |
 
 ## 8. Non-functional requirements
 
@@ -213,6 +215,8 @@ These are initial decisions, not permission to implement every technology at onc
 - Given an available item, adding it updates the basket quantity and total; removing the final item returns the basket to an empty state.
 - Given a product with supported choices, opening its detail view exposes the permitted customisation controls and stores a readable customisation snapshot in the basket.
 - Given a menu item, its calorie estimate is shown with an explicit unverified prototype-data notice.
+- Given the Home or Menu category grid, all four product categories are visible without horizontal scrolling; selecting one opens the Menu tab with that category shown.
+- Given basket or order-history content, cards and controls use deliberate spacing, compact quantity actions, product imagery and concise secondary details; tapping an order exposes the full item-level information.
 
 ### Checkout and tracking
 
