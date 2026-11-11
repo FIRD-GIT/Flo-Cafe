@@ -62,7 +62,7 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Code-to-screen translation:** the Home tab displays `Welcome, {display name}`, featured items, category shortcuts, favourites and order status. Menu cards show original imagery, price, calories and a Customise action. The customisation form captures size, milk, shots, temperature, sweetness, syrups, toppings and whipped cream into a basket summary. Basket and Profile are separate destinations with quantity controls, totals, order history, preferences and safe sign out.
 - **Validation:** Firebase-enabled `assembleDebug` and `testDebugUnitTest` passed; the no-Firebase build exposed the local demo entry point; the demo APK installed on the emulator. Authenticated manual tab and checkout evidence remains dependent on using a configured test account.
 - **Known limitations:** nutrition values are AI-generated estimates and are not authoritative; profile editing and preferences are currently local UI state; menu data remains local rather than Firestore-managed.
-- **Commit reference:** to be added after review and commit.
+- **Commit reference:** `a877530` (`Customer tab redesign`).
 
 ## 2026-11-11 — Veracity and usability refinement
 
