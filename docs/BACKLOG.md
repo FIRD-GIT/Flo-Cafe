@@ -23,6 +23,11 @@ Priorities follow the coursework lab convention: **Must**, **Should**, **Could**
 | CAFE-16 | As a customer, I want a coffee-cup indicator to fill while my order is prepared so that progress is understandable at a glance. | The cup maps to defined order statuses, fills progressively, and is full when the order is ready or complete. | Must | Firdaos | Done |
 | CAFE-17 | As a customer, I want a completion notification so that I know when to collect my order. | A notification or documented in-app equivalent is triggered when the order reaches the completion threshold and remains usable if notification delivery fails. | Should | Firdaos | Done |
 | CAFE-18 | As a developer, I want an implementation evidence log so that every feature can be explained from requirement through code to mobile behaviour. | Each entry records purpose, user value, requirement/backlog link, source location, app behaviour, tests/evidence, and decision rationale. | Must | Firdaos | Done |
+| CAFE-19 | As a customer, I want Home, Menu, Basket, and Profile as separate tabs so that the app is easier to understand. | Bottom navigation switches between four distinct destinations and preserves the active basket. | Must | Firdaos | In progress |
+| CAFE-20 | As a customer, I want a larger categorised menu so that I can discover more café products. | Hot Drinks, Cold Drinks, Sweet Treats, and Sandwiches contain multiple products with original imagery. | Must | Firdaos | In progress |
+| CAFE-21 | As a customer, I want to customise coffee like a major coffee-chain app so that my order matches my preferences. | Product detail supports size, milk, shots, temperature, sweetness, syrups, toppings, and whipped cream; the basket stores the summary. | Must | Firdaos | In progress |
+| CAFE-22 | As a customer, I want nutrition information so that I can make an informed choice. | Each item shows a clearly labelled AI-generated, unverified prototype estimate until verified data is supplied. | Should | Firdaos | In progress |
+| CAFE-23 | As a customer, I want my home screen personalised so that it feels like my account. | Home displays `Welcome, {display name}`, featured products, shortcuts, favourites and order status. | Should | Firdaos | In progress |
 
 ## Definition of done
 

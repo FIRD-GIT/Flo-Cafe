@@ -1,13 +1,17 @@
 package com.firdgit.flocafe
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
+import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -20,192 +24,331 @@ class CustomerActivity : AppCompatActivity() {
         const val EXTRA_DEMO_MODE = "demo_mode"
     }
 
+    private lateinit var contentFrame: FrameLayout
     private lateinit var statusText: TextView
-    private lateinit var menuContainer: LinearLayout
-    private lateinit var basketText: TextView
-    private lateinit var ordersText: TextView
-    private lateinit var ordersContainer: LinearLayout
-    private lateinit var checkoutButton: Button
     private lateinit var userRepository: UserRepository
     private lateinit var orderRepository: OrderRepository
-    private val basket = mutableMapOf<String, BasketLine>()
-    private val quantityLabels = mutableMapOf<String, TextView>()
+    private val basket = mutableListOf<BasketLine>()
+    private val favourites = mutableSetOf<String>()
+    private var orders = emptyList<OrderRepository.OrderSummary>()
+    private var displayName = "Customer"
+    private var selectedTab = Tab.HOME
     private var isSubmitting = false
     private val isDemoMode by lazy { intent.getBooleanExtra(EXTRA_DEMO_MODE, false) }
+
+    private enum class Tab { HOME, MENU, BASKET, PROFILE }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_customer)
+        contentFrame = findViewById(R.id.customerContentFrame)
         statusText = findViewById(R.id.customerStatusText)
-        menuContainer = findViewById(R.id.menuContainer)
-        basketText = findViewById(R.id.basketText)
-        ordersText = findViewById(R.id.ordersText)
-        ordersContainer = findViewById(R.id.ordersContainer)
-        checkoutButton = findViewById(R.id.checkoutButton)
         userRepository = UserRepository(this)
         orderRepository = OrderRepository(userRepository)
 
-        findViewById<Button>(R.id.logoutButton).setOnClickListener { signOut() }
-        showCustomerMenu()
+        findViewById<Button>(R.id.homeTabButton).setOnClickListener { showTab(Tab.HOME) }
+        findViewById<Button>(R.id.menuTabButton).setOnClickListener { showTab(Tab.MENU) }
+        findViewById<Button>(R.id.basketTabButton).setOnClickListener { showTab(Tab.BASKET) }
+        findViewById<Button>(R.id.profileTabButton).setOnClickListener { showTab(Tab.PROFILE) }
+
         if (isDemoMode) {
+            displayName = "Demo customer"
             statusText.text = getString(R.string.demo_mode_message)
-            checkoutButton.isEnabled = false
-            checkoutButton.text = getString(R.string.demo_checkout_disabled)
-            ordersText.text = getString(R.string.demo_orders_disabled)
         } else {
-            loadCustomerGreeting()
-            loadCustomerOrders()
+            loadCustomerDetails()
         }
+        showTab(Tab.HOME)
     }
 
-    private fun loadCustomerGreeting() {
+    private fun loadCustomerDetails() {
         lifecycleScope.launch {
-            val displayName = runCatching { userRepository.currentUserDisplayName() }
+            displayName = runCatching { userRepository.currentUserDisplayName() }
                 .getOrNull()
+                ?.takeIf { it.isNotBlank() }
                 ?: getString(R.string.default_customer_name)
             statusText.text = getString(R.string.customer_welcome_message, displayName)
+            loadCustomerOrders()
+            showTab(selectedTab)
         }
     }
 
-    private fun showCustomerMenu() {
-        checkoutButton.setOnClickListener {
-            if (basket.isEmpty()) {
-                statusText.text = getString(R.string.empty_basket)
-                return@setOnClickListener
+    private fun loadCustomerOrders() {
+        if (isDemoMode) return
+        lifecycleScope.launch {
+            orders = runCatching { orderRepository.currentCustomerOrders() }.getOrElse {
+                emptyList()
             }
-            checkForRecentDuplicate()
+            if (selectedTab == Tab.HOME || selectedTab == Tab.PROFILE) showTab(selectedTab)
         }
-
-        MenuRepository().availableItems()
-            .groupBy { it.category }
-            .forEach { (category, items) ->
-                addCategoryHeader(category)
-                items.forEach(::addMenuItemRow)
-            }
-        updateBasketText()
     }
 
-    private fun addCategoryHeader(category: String) {
-        menuContainer.addView(
-            TextView(this).apply {
-                text = category
-                textSize = 20f
-                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium)
-                setPadding(0, dp(18), 0, dp(8))
+    private fun showTab(tab: Tab) {
+        selectedTab = tab
+        contentFrame.removeAllViews()
+        contentFrame.addView(
+            when (tab) {
+                Tab.HOME -> homeView()
+                Tab.MENU -> menuView()
+                Tab.BASKET -> basketView()
+                Tab.PROFILE -> profileView()
             },
         )
+        updateNavigationButtons()
     }
 
-    private fun addMenuItemRow(item: MenuItem) {
-        val row = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(0, dp(8), 0, dp(14))
+    private fun updateNavigationButtons() {
+        val buttons = mapOf(
+            Tab.HOME to findViewById<Button>(R.id.homeTabButton),
+            Tab.MENU to findViewById<Button>(R.id.menuTabButton),
+            Tab.BASKET to findViewById<Button>(R.id.basketTabButton),
+            Tab.PROFILE to findViewById<Button>(R.id.profileTabButton),
+        )
+        buttons.forEach { (tab, button) ->
+            button.setTextColor(Color.parseColor(if (tab == selectedTab) "#6A35C9" else "#6B6673"))
+            button.setBackgroundColor(Color.parseColor(if (tab == selectedTab) "#F0E9FF" else "#FFFFFF"))
         }
-        val itemContent = LinearLayout(this).apply {
+    }
+
+    private fun homeView(): View = verticalScroll {
+        addView(title(getString(R.string.home_greeting, displayName), 28f))
+        addView(body(getString(R.string.home_subtitle)))
+        addView(sectionTitle(getString(R.string.featured_heading)))
+        MenuRepository().availableItems().take(3).forEach { addView(productCard(it, compact = true)) }
+        addView(sectionTitle(getString(R.string.categories_heading)))
+        listOf(
+            getString(R.string.category_hot_drinks),
+            getString(R.string.category_cold_drinks),
+            getString(R.string.category_sweet_treats),
+            getString(R.string.category_sandwiches),
+        ).forEach { category ->
+            addView(actionButton(category) {
+                showTab(Tab.MENU)
+            })
+        }
+        addView(sectionTitle(getString(R.string.order_status_heading)))
+        if (orders.isEmpty()) {
+            addView(body(if (isDemoMode) getString(R.string.demo_orders_disabled) else getString(R.string.no_orders)))
+        } else {
+            orders.take(2).forEach { addView(orderCard(it)) }
+        }
+        addView(sectionTitle(getString(R.string.quick_actions_heading)))
+        addView(actionButton(getString(R.string.view_menu)) { showTab(Tab.MENU) })
+        addView(actionButton(getString(R.string.view_basket)) { showTab(Tab.BASKET) })
+    }
+
+    private fun menuView(): View = verticalScroll {
+        addView(title(getString(R.string.menu_heading), 28f))
+        addView(body(getString(R.string.menu_subtitle)))
+        val categories = listOf(
+            getString(R.string.category_all),
+            getString(R.string.category_hot_drinks),
+            getString(R.string.category_cold_drinks),
+            getString(R.string.category_sweet_treats),
+            getString(R.string.category_sandwiches),
+        )
+        val categoryRow = horizontalRow()
+        categories.forEach { category ->
+            categoryRow.addView(actionButton(category) {
+                renderMenuItems(category)
+            }, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
+        }
+        addView(categoryRow)
+        addView(menuItemsContainer())
+    }
+
+    private fun renderMenuItems(category: String) {
+        val container = contentFrame.findViewWithTag<LinearLayout>("menu_items")
+            ?: return
+        container.removeAllViews()
+        val items = MenuRepository().availableItems().filter {
+            category == getString(R.string.category_all) || it.category == category
+        }
+        items.groupBy { it.category }.forEach { (group, groupedItems) ->
+            container.addView(sectionTitle(group))
+            groupedItems.forEach { container.addView(productCard(it, compact = false)) }
+        }
+    }
+
+    private fun menuItemsContainer(): LinearLayout = LinearLayout(this).apply {
+        tag = "menu_items"
+        orientation = LinearLayout.VERTICAL
+        setPadding(dp(2), dp(12), dp(2), dp(16))
+        MenuRepository().availableItems().groupBy { it.category }.forEach { (group, items) ->
+            addView(sectionTitle(group))
+            items.forEach { addView(productCard(it, compact = false)) }
+        }
+    }
+
+    private fun productCard(item: MenuItem, compact: Boolean): View {
+        val card = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            setBackgroundColor(Color.WHITE)
         }
         val image = ImageView(this).apply {
-            if (item.imageResId != 0) setImageResource(item.imageResId)
+            setImageResource(item.imageResId)
             contentDescription = getString(R.string.product_image_description, item.name)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
-        itemContent.addView(
-            image,
-            LinearLayout.LayoutParams(dp(72), dp(72)).apply {
-                marginEnd = dp(12)
-            },
-        )
-        val details = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
+        card.addView(image, LinearLayout.LayoutParams(dp(if (compact) 72 else 88), dp(if (compact) 72 else 88)).apply {
+            marginEnd = dp(12)
+        })
+        val details = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        details.addView(title(item.name, if (compact) 18f else 20f))
+        details.addView(body(getString(R.string.product_card_details, item.calories, item.description)))
+        details.addView(body(getString(R.string.price_format, item.price)))
+        val customise = actionButton(getString(R.string.customise_item)) {
+            showProductDetail(item)
         }
-        details.addView(
-            TextView(this).apply {
-                text = item.name
-                textSize = 17f
-                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleSmall)
-            },
-        )
-        details.addView(
-            TextView(this).apply {
-                text = getString(R.string.menu_item_description, item.description, item.price)
-                textSize = 14f
-            },
-        )
-        itemContent.addView(
-            details,
-            LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f),
-        )
-        row.addView(itemContent)
-
-        val customisationLabel = TextView(this).apply {
-            text = getString(R.string.customisation_label)
-            setPadding(0, dp(8), 0, 0)
-        }
-        row.addView(customisationLabel)
-
-        val customisationSpinner = Spinner(this).apply {
-            contentDescription = getString(R.string.customisation_description, item.name)
-            adapter = android.widget.ArrayAdapter(
-                this@CustomerActivity,
-                android.R.layout.simple_spinner_item,
-                item.customisationOptions,
-            ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-        }
-        row.addView(customisationSpinner)
-
-        val actions = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        val addButton = Button(this).apply {
-            text = getString(R.string.add_to_basket)
-            contentDescription = getString(R.string.add_product_description, item.name)
-            setOnClickListener {
-                val selected = customisationSpinner.selectedItem?.toString() ?: "Standard"
-                addItemToBasket(item, selected)
-            }
-        }
-        actions.addView(addButton, LinearLayout.LayoutParams(0, dp(48), 1f))
-        val quantityText = TextView(this).apply {
-            text = getString(R.string.product_quantity, 0)
-            textSize = 16f
-            gravity = Gravity.CENTER
-            contentDescription = getString(R.string.quantity_description, item.name)
-        }
-        quantityLabels[item.id] = quantityText
-        actions.addView(quantityText, LinearLayout.LayoutParams(dp(88), dp(48)))
-        row.addView(actions)
-        menuContainer.addView(row)
+        details.addView(customise)
+        card.addView(details, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        return card
     }
 
-    private fun addItemToBasket(item: MenuItem, customisation: String) {
-        val line = basket[item.id]
-        if (line == null) {
-            basket[item.id] = BasketLine(item, 1, customisation)
-        } else {
-            line.quantity += 1
-            line.customisation = customisation
+    private fun showProductDetail(item: MenuItem) {
+        val form = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), dp(4), dp(20), 0)
         }
-        updateBasketText()
+        form.addView(body(getString(R.string.nutrition_estimate_notice, item.nutritionNote)))
+        val selections = linkedMapOf(
+            getString(R.string.option_size) to item.sizeOptions,
+            getString(R.string.option_milk) to item.milkOptions,
+            getString(R.string.option_shots) to item.shotOptions,
+            getString(R.string.option_temperature) to item.temperatureOptions,
+            getString(R.string.option_sweetness) to item.sweetnessOptions,
+            getString(R.string.option_syrup) to item.syrupOptions,
+            getString(R.string.option_topping) to item.toppingOptions,
+        )
+        val spinners = selections.map { (label, values) ->
+            form.addView(body(label))
+            Spinner(this).also { spinner ->
+                spinner.adapter = ArrayAdapter(
+                    this,
+                    android.R.layout.simple_spinner_item,
+                    values,
+                ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+                form.addView(spinner)
+            }
+        }
+        val whippedCream = CheckBox(this).apply {
+            text = getString(R.string.option_whipped_cream)
+        }
+        form.addView(whippedCream)
+        form.addView(body(getString(R.string.nutrition_summary, item.calories)))
+
+        AlertDialog.Builder(this)
+            .setTitle(item.name)
+            .setView(form)
+            .setNegativeButton(R.string.cancel_order, null)
+            .setPositiveButton(R.string.add_to_basket) { _, _ ->
+                val summary = selections.keys.zip(spinners.map { it.selectedItem.toString() })
+                    .joinToString(", ") { (label, value) -> "$label: $value" } +
+                    if (whippedCream.isChecked) ", ${getString(R.string.option_whipped_cream)}" else ""
+                addItemToBasket(item, summary)
+            }
+            .show()
+    }
+
+    private fun basketView(): View = verticalScroll {
+        addView(title(getString(R.string.basket_heading), 28f))
+        if (basket.isEmpty()) {
+            addView(body(getString(R.string.basket_empty)))
+            addView(actionButton(getString(R.string.add_items)) { showTab(Tab.MENU) })
+            return@verticalScroll
+        }
+        basket.toList().forEachIndexed { index, line ->
+            addView(basketLineCard(index, line))
+        }
+        addView(sectionTitle(getString(R.string.basket_total_heading)))
+        addView(title(getString(R.string.price_format, basketTotal()), 24f))
+        addView(actionButton(getString(R.string.checkout_preview_button)) {
+            checkForRecentDuplicate()
+        })
+        addView(actionButton(getString(R.string.clear_basket)) {
+            basket.clear()
+            showTab(Tab.BASKET)
+        })
+    }
+
+    private fun basketLineCard(index: Int, line: BasketLine): View {
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            setBackgroundColor(Color.WHITE)
+        }
+        row.addView(title(line.item.name, 19f))
+        row.addView(body(line.customisation))
+        row.addView(body(getString(R.string.product_nutrition_short, line.item.calories)))
+        val controls = horizontalRow()
+        controls.addView(actionButton("-") {
+            if (line.quantity > 1) line.quantity-- else basket.removeAt(index)
+            showTab(Tab.BASKET)
+        }, LinearLayout.LayoutParams(0, dp(48), 1f))
+        controls.addView(body(getString(R.string.product_quantity, line.quantity)).apply {
+            gravity = Gravity.CENTER
+        }, LinearLayout.LayoutParams(0, dp(48), 1f))
+        controls.addView(actionButton("+") {
+            line.quantity++
+            showTab(Tab.BASKET)
+        }, LinearLayout.LayoutParams(0, dp(48), 1f))
+        row.addView(controls)
+        return row
+    }
+
+    private fun profileView(): View = verticalScroll {
+        addView(title(getString(R.string.profile_heading), 28f))
+        addView(body(getString(R.string.profile_email, userRepository.currentUserEmail ?: "Demo account")))
+        addView(actionButton(getString(R.string.edit_profile)) { editDisplayName() })
+        addView(sectionTitle(getString(R.string.profile_orders_heading)))
+        if (orders.isEmpty()) addView(body(getString(R.string.no_orders)))
+        else orders.forEach { addView(orderCard(it)) }
+        addView(sectionTitle(getString(R.string.favourites_heading)))
+        addView(body(if (favourites.isEmpty()) getString(R.string.no_favourites) else favourites.joinToString(", ")))
+        addView(sectionTitle(getString(R.string.preferences_heading)))
+        listOf(
+            getString(R.string.preference_vegetarian),
+            getString(R.string.preference_dairy_free),
+            getString(R.string.preference_lower_sugar),
+        ).forEach { preference ->
+            addView(CheckBox(this@CustomerActivity).apply { text = preference })
+        }
+        addView(actionButton(getString(R.string.sign_out)) { signOut() })
+    }
+
+    private fun orderCard(order: OrderRepository.OrderSummary): View =
+        body(getString(R.string.order_summary, order.id, order.status, order.total, orderProgress(order.status)))
+
+    private fun addItemToBasket(item: MenuItem, customisation: String) {
+        val existing = basket.firstOrNull {
+            it.item.id == item.id && it.customisation == customisation
+        }
+        if (existing == null) basket.add(BasketLine(item, 1, customisation))
+        else existing.quantity++
+        favourites.add(item.name)
         statusText.text = getString(R.string.item_added, item.name)
+        showTab(Tab.BASKET)
     }
 
     private fun checkForRecentDuplicate() {
+        if (basket.isEmpty()) {
+            statusText.text = getString(R.string.empty_basket)
+            return
+        }
+        if (isDemoMode) {
+            statusText.text = getString(R.string.demo_checkout_disabled)
+            return
+        }
         if (isSubmitting) return
         statusText.text = getString(R.string.checking_order)
         lifecycleScope.launch {
-            runCatching { orderRepository.findRecentDuplicate(basket.values.toList()) }
+            runCatching { orderRepository.findRecentDuplicate(basket) }
                 .onSuccess { duplicate ->
-                    if (duplicate == null) {
-                        submitOrder()
-                    } else {
-                        showDuplicateConfirmation(duplicate.id)
-                    }
+                    if (duplicate == null) submitOrder()
+                    else showDuplicateConfirmation(duplicate.id)
                 }
-                .onFailure { error ->
-                    statusText.text = error.message ?: getString(R.string.order_failed)
-                }
+                .onFailure { error -> statusText.text = error.message ?: getString(R.string.order_failed) }
         }
     }
 
@@ -213,7 +356,7 @@ class CustomerActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(R.string.duplicate_order_title)
             .setMessage(getString(R.string.duplicate_order_message, orderId))
-            .setNegativeButton(R.string.cancel_order) { dialog, _ -> dialog.dismiss() }
+            .setNegativeButton(R.string.cancel_order, null)
             .setPositiveButton(R.string.confirm_duplicate_order) { _, _ -> submitOrder() }
             .show()
     }
@@ -221,105 +364,32 @@ class CustomerActivity : AppCompatActivity() {
     private fun submitOrder() {
         if (isSubmitting) return
         isSubmitting = true
-        checkoutButton.isEnabled = false
-        statusText.text = getString(R.string.order_submitting)
         lifecycleScope.launch {
-            runCatching { orderRepository.submitOrder(basket.values.toList()) }
+            runCatching { orderRepository.submitOrder(basket) }
                 .onSuccess { orderId ->
                     basket.clear()
-                    updateBasketText()
                     statusText.text = getString(R.string.order_submitted, orderId)
                     loadCustomerOrders()
+                    showTab(Tab.HOME)
                 }
-                .onFailure { error ->
-                    statusText.text = error.message ?: getString(R.string.order_failed)
-                }
+                .onFailure { error -> statusText.text = error.message ?: getString(R.string.order_failed) }
             isSubmitting = false
-            checkoutButton.isEnabled = true
         }
     }
 
-    private fun loadCustomerOrders() {
-        lifecycleScope.launch {
-            runCatching { orderRepository.currentCustomerOrders() }
-                .onSuccess { orders ->
-                    ordersContainer.removeViews(1, (ordersContainer.childCount - 1).coerceAtLeast(0))
-                    ordersText.text = if (orders.isEmpty()) {
-                        getString(R.string.no_orders)
-                    } else {
-                        getString(R.string.current_orders_heading)
-                    }
-                    orders.forEach(::addOrderProgressCard)
-                    if (orders.any { it.status == "Ready for Collection" || it.status == "Collected" }) {
-                        statusText.text = getString(R.string.order_ready_notification)
-                    }
-                }
-                .onFailure { error ->
-                    ordersText.text = error.message ?: getString(R.string.orders_failed)
-                }
-        }
+    private fun editDisplayName() {
+        val input = android.widget.EditText(this).apply { setText(displayName) }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.edit_profile)
+            .setView(input)
+            .setNegativeButton(R.string.cancel_order, null)
+            .setPositiveButton(R.string.save_profile) { _, _ ->
+                displayName = input.text.toString().trim().ifBlank { displayName }
+                statusText.text = getString(R.string.profile_saved)
+                showTab(Tab.PROFILE)
+            }
+            .show()
     }
-
-    private fun addOrderProgressCard(order: OrderRepository.OrderSummary) {
-        val card = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(0, dp(10), 0, dp(10))
-        }
-        card.addView(
-            TextView(this).apply {
-                text = getString(
-                    R.string.order_summary,
-                    order.id,
-                    order.status,
-                    order.total,
-                    orderProgress(order.status),
-                )
-                textSize = 15f
-            },
-        )
-        card.addView(
-            TextView(this).apply {
-                text = getString(R.string.coffee_progress_label)
-                setPadding(0, dp(4), 0, 0)
-            },
-        )
-        card.addView(
-            ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
-                max = 4
-                progress = orderProgress(order.status).substringBefore('/').toInt()
-                contentDescription = getString(R.string.coffee_progress_description, order.status)
-            },
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                dp(12),
-            ),
-        )
-        ordersContainer.addView(card)
-    }
-
-    private fun updateBasketText() {
-        basketText.text = if (basket.isEmpty()) {
-            getString(R.string.basket_empty)
-        } else {
-            getString(
-                R.string.basket_summary,
-                basket.values.sumOf { it.quantity },
-                basketTotal(),
-                basket.values.joinToString("\n") {
-                    getString(R.string.basket_line, it.item.name, it.customisation, it.quantity)
-                },
-            )
-        }
-        basket.forEach { (id, line) ->
-            quantityLabels[id]?.text = getString(R.string.product_quantity, line.quantity)
-        }
-        quantityLabels.filterKeys { it !in basket.keys }.values.forEach {
-            it.text = getString(R.string.product_quantity, 0)
-        }
-    }
-
-    private fun basketTotal(): String =
-        "%.2f".format(basket.values.sumOf { it.item.price * it.quantity })
 
     private fun signOut() {
         AlertDialog.Builder(this)
@@ -333,6 +403,50 @@ class CustomerActivity : AppCompatActivity() {
             }
             .show()
     }
+
+    private fun verticalScroll(content: LinearLayout.() -> Unit): ScrollView =
+        ScrollView(this).apply {
+            isFillViewport = true
+            addView(LinearLayout(this@CustomerActivity).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(4), dp(12), dp(4), dp(24))
+                content()
+            })
+        }
+
+    private fun horizontalRow() = LinearLayout(this).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+    }
+
+    private fun title(value: String, size: Float) = TextView(this).apply {
+        text = value
+        textSize = size
+        setTextColor(Color.parseColor("#24202B"))
+        setPadding(0, dp(8), 0, dp(8))
+        setTypeface(typeface, android.graphics.Typeface.BOLD)
+    }
+
+    private fun sectionTitle(value: String) = title(value, 21f)
+
+    private fun body(value: String) = TextView(this).apply {
+        text = value
+        textSize = 15f
+        setTextColor(Color.parseColor("#6B6673"))
+        setPadding(0, dp(4), 0, dp(6))
+    }
+
+    private fun actionButton(label: String, action: () -> Unit) = Button(this).apply {
+        text = label
+        isAllCaps = false
+        setTextColor(Color.WHITE)
+        setBackgroundColor(Color.parseColor("#6A35C9"))
+        setOnClickListener { action() }
+        contentDescription = label
+    }
+
+    private fun basketTotal(): String =
+        "%.2f".format(basket.sumOf { it.item.price * it.quantity })
 
     private fun orderProgress(status: String): String = when (status) {
         "Pending" -> "1/4"

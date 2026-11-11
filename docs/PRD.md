@@ -95,6 +95,17 @@ The tutor provides feedback and may request changes during weekly development. O
 - Sales analytics dashboard.
 - Accessibility and theming refinements beyond the core acceptance criteria.
 
+### Customer experience redesign
+
+The customer release is being elevated from a single-page prototype to a four-tab experience:
+
+- **Home:** personalised `Welcome, {display name}` greeting, featured/seasonal products, category shortcuts, favourites and current-order status.
+- **Menu:** four categories — Hot Drinks, Cold Drinks, Sweet Treats, and Sandwiches — with product imagery, descriptions, prices and estimated nutrition.
+- **Basket:** item imagery, full customisation summaries, quantity controls, subtotal, clear basket and checkout.
+- **Profile:** display name/email, local profile editing, order history, saved favourites, dietary preference controls and safe sign out.
+
+Coffee customisation includes size, milk type, espresso-shot count, temperature, sweetness, syrups, toppings and whipped cream. Nutrition figures are currently AI-assisted prototype estimates and must be labelled as unverified rather than presented as medical or official product data.
+
 ## 6. User journeys
 
 ### Registration and login
@@ -125,7 +136,7 @@ Completed order → rate service/products → submit feedback → confirmation.
 |---|---|---|
 | FR-01 | The customer can register with a valid email address and password. | Must |
 | FR-02 | The customer can log in, remain signed in across app restarts, and log out. | Must |
-| FR-03 | The customer can browse products with name, description, price, category, availability, imagery, and controlled customisation choices. | Must |
+| FR-03 | The customer can browse products with name, description, price, category, availability, imagery, estimated nutrition, and controlled customisation choices. | Must |
 | FR-04 | The customer can search or filter available products. | Must |
 | FR-05 | The customer can add products to a basket and change quantities. | Must |
 | FR-06 | The customer can remove products and see an updated total. | Must |
@@ -139,6 +150,10 @@ Completed order → rate service/products → submit feedback → confirmation.
 | FR-14 | A permitted sub-admin can view incoming orders and update their controlled preparation status. | Must |
 | FR-15 | The current-order view displays a coffee-cup progress indicator that fills as the order advances and is full when the order is complete. | Must |
 | FR-16 | The customer receives a clear notification when the order reaches Ready for Collection or the final completion state. | Should |
+| FR-17 | The customer can navigate Home, Menu, Basket, and Profile as separate tab destinations. | Must |
+| FR-18 | The customer can customise supported drinks using size, milk, shots, temperature, sweetness, syrups, toppings, and whipped cream controls. | Must |
+| FR-19 | The customer can see a personalised Home greeting using their stored display name. | Should |
+| FR-20 | The customer can view clearly labelled prototype nutrition estimates for menu products. | Should |
 
 ## 8. Non-functional requirements
 
@@ -196,6 +211,8 @@ These are initial decisions, not permission to implement every technology at onc
 - Given available menu data, the customer can browse logical categories, see product imagery, price and availability, and choose supported customisations.
 - Given a search term, only matching products are shown, with a clear empty state if there are no matches.
 - Given an available item, adding it updates the basket quantity and total; removing the final item returns the basket to an empty state.
+- Given a product with supported choices, opening its detail view exposes the permitted customisation controls and stores a readable customisation snapshot in the basket.
+- Given a menu item, its calorie estimate is shown with an explicit unverified prototype-data notice.
 
 ### Checkout and tracking
 

@@ -52,6 +52,18 @@ Each feature entry should explain:
 
 Add dated entries below as implementation begins. Do not mark a feature complete until the code location, visible behaviour, and validation evidence are recorded.
 
+## 2026-11-11 — Customer tab redesign and expanded catalogue
+
+- **Status:** Implemented and build-verified; live authenticated visual evidence remains to be captured.
+- **Requirement links:** PRD FR-03, FR-05, FR-06, FR-17, FR-18, FR-19, FR-20; CAFE-19, CAFE-20, CAFE-21, CAFE-22, CAFE-23.
+- **Purpose and user value:** move beyond the original prototype by separating the customer journey into understandable destinations, increasing menu choice, and making customisation and nutritional context visible before checkout.
+- **Decision and rationale:** retain one customer activity and use a tab shell with independently rendered Home, Menu, Basket and Profile content. This keeps the current Firebase repository and duplicate-order safeguards stable while allowing the UI to evolve without introducing a navigation dependency. Product detail uses a controlled dialog so unsupported combinations cannot be submitted.
+- **Code location:** `CustomerActivity.kt`, `MenuItem.kt`, `MenuRepository.kt`, `activity_customer.xml`, `strings.xml`, and the new product vector drawables.
+- **Code-to-screen translation:** the Home tab displays `Welcome, {display name}`, featured items, category shortcuts, favourites and order status. Menu cards show original imagery, price, calories and a Customise action. The customisation form captures size, milk, shots, temperature, sweetness, syrups, toppings and whipped cream into a basket summary. Basket and Profile are separate destinations with quantity controls, totals, order history, preferences and safe sign out.
+- **Validation:** Firebase-enabled `assembleDebug` and `testDebugUnitTest` passed; the no-Firebase build exposed the local demo entry point; the demo APK installed on the emulator. Authenticated manual tab and checkout evidence remains dependent on using a configured test account.
+- **Known limitations:** nutrition values are AI-generated estimates and are not authoritative; profile editing and preferences are currently local UI state; menu data remains local rather than Firestore-managed.
+- **Commit reference:** to be added after review and commit.
+
 ## 2026-11-11 — Veracity and usability refinement
 
 - **Status:** Implemented and build-verified.
