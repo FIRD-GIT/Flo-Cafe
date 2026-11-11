@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.FrameLayout
-import android.widget.HorizontalScrollView
+import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -38,6 +38,7 @@ class CustomerActivity : AppCompatActivity() {
     private var orders = emptyList<OrderRepository.OrderSummary>()
     private var displayName = "Customer"
     private var selectedTab = Tab.HOME
+    private var selectedMenuCategory: String? = null
     private var isSubmitting = false
     private val isDemoMode by lazy { intent.getBooleanExtra(EXTRA_DEMO_MODE, false) }
 
@@ -120,23 +121,7 @@ class CustomerActivity : AppCompatActivity() {
         addView(sectionTitle(getString(R.string.featured_heading)))
         MenuRepository().availableItems().take(3).forEach { addView(productCard(it, compact = true)) }
         addView(sectionTitle(getString(R.string.categories_heading)))
-        listOf(
-            getString(R.string.category_hot_drinks),
-            getString(R.string.category_cold_drinks),
-            getString(R.string.category_sweet_treats),
-            getString(R.string.category_sandwiches),
-        ).forEach { category ->
-            addView(
-                actionButton(category) { showTab(Tab.MENU) },
-                LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    dp(56),
-                ).apply {
-                    topMargin = dp(6)
-                    bottomMargin = dp(6)
-                },
-            )
-        }
+        addView(categoryGrid())
         addView(sectionTitle(getString(R.string.order_status_heading)))
         if (orders.isEmpty()) {
             addView(body(if (isDemoMode) getString(R.string.demo_orders_disabled) else getString(R.string.no_orders)))
@@ -151,40 +136,25 @@ class CustomerActivity : AppCompatActivity() {
     private fun menuView(): View = verticalScroll {
         addView(title(getString(R.string.menu_heading), 28f))
         addView(body(getString(R.string.menu_subtitle)))
-        val categories = listOf(
-            getString(R.string.category_all),
-            getString(R.string.category_hot_drinks),
-            getString(R.string.category_cold_drinks),
-            getString(R.string.category_sweet_treats),
-            getString(R.string.category_sandwiches),
+        addView(
+            secondaryButton(getString(R.string.category_all)) {
+                renderMenuItems(getString(R.string.category_all))
+            },
+            LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(44)).apply {
+                setMargins(dp(4), dp(4), dp(4), dp(8))
+            },
         )
-        val categoryRow = horizontalRow().apply {
-            setPadding(dp(2), dp(4), dp(2), dp(8))
-        }
-        categories.forEach { category ->
-            categoryRow.addView(actionButton(category) {
-                renderMenuItems(category)
-            }, LinearLayout.LayoutParams(
-                dp(if (category.length > 10) 150 else 92),
-                dp(52),
-            ).apply {
-                marginStart = dp(4)
-                marginEnd = dp(4)
-            })
-        }
-        addView(HorizontalScrollView(this@CustomerActivity).apply {
-            isHorizontalScrollBarEnabled = false
-            addView(categoryRow)
-        })
-        addView(menuItemsContainer())
+        addView(categoryGrid())
+        addView(menuItemsContainer(selectedMenuCategory))
     }
 
     private fun renderMenuItems(category: String) {
+        selectedMenuCategory = category.takeUnless { it == getString(R.string.category_all) }
         val container = contentFrame.findViewWithTag<LinearLayout>("menu_items")
             ?: return
         container.removeAllViews()
         val items = MenuRepository().availableItems().filter {
-            category == getString(R.string.category_all) || it.category == category
+            selectedMenuCategory == null || it.category == selectedMenuCategory
         }
         items.groupBy { it.category }.forEach { (group, groupedItems) ->
             container.addView(sectionTitle(group))
@@ -192,11 +162,42 @@ class CustomerActivity : AppCompatActivity() {
         }
     }
 
-    private fun menuItemsContainer(): LinearLayout = LinearLayout(this).apply {
+    private fun categoryGrid(): View {
+        val categories = listOf(
+            getString(R.string.category_hot_drinks),
+            getString(R.string.category_cold_drinks),
+            getString(R.string.category_sweet_treats),
+            getString(R.string.category_sandwiches),
+        )
+        return GridLayout(this).apply {
+            columnCount = 2
+            rowCount = (categories.size + 1) / 2
+            useDefaultMargins = false
+            setPadding(0, dp(4), 0, dp(10))
+            categories.forEachIndexed { index, category ->
+                val button = actionButton(category) {
+                    selectedMenuCategory = category
+                    showTab(Tab.MENU)
+                }
+                addView(button, GridLayout.LayoutParams().apply {
+                    width = 0
+                    height = dp(58)
+                    columnSpec = GridLayout.spec(index % 2, 1f)
+                    rowSpec = GridLayout.spec(index / 2)
+                    setMargins(dp(4), dp(4), dp(4), dp(4))
+                })
+            }
+        }
+    }
+
+    private fun menuItemsContainer(category: String?): LinearLayout = LinearLayout(this).apply {
         tag = "menu_items"
         orientation = LinearLayout.VERTICAL
         setPadding(dp(2), dp(12), dp(2), dp(16))
-        MenuRepository().availableItems().groupBy { it.category }.forEach { (group, items) ->
+        MenuRepository().availableItems()
+            .filter { category == null || it.category == category }
+            .groupBy { it.category }
+            .forEach { (group, items) ->
             addView(sectionTitle(group))
             items.forEach { addView(productCard(it, compact = false)) }
         }
@@ -222,17 +223,28 @@ class CustomerActivity : AppCompatActivity() {
         details.addView(title(item.name, if (compact) 18f else 20f))
         details.addView(body(getString(R.string.product_card_details, item.calories, item.description)))
         details.addView(body(PriceFormatter.format(item.price)))
-        val customise = actionButton(
-            getString(if (item.isCustomisable) R.string.customise_item else R.string.add_to_basket),
-        ) {
-            if (item.isCustomisable) {
-                showProductDetail(item)
-            } else {
+        val actions = horizontalRow().apply { setPadding(0, dp(4), 0, 0) }
+        if (item.isCustomisable) {
+            actions.addView(actionButton(getString(R.string.add_to_basket)) {
                 addItemToBasket(item, getString(R.string.standard_customisation))
-            }
+            }, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(6) })
+            actions.addView(secondaryButton(getString(R.string.customise_item)) {
+                showProductDetail(item)
+            }, LinearLayout.LayoutParams(0, dp(44), 1f))
+        } else {
+            actions.addView(actionButton(getString(R.string.add_to_basket)) {
+                addItemToBasket(item, getString(R.string.standard_customisation))
+            }, LinearLayout.LayoutParams.MATCH_PARENT, dp(44))
         }
-        details.addView(customise)
+        details.addView(actions)
         card.addView(details, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        card.layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+        ).apply {
+            topMargin = dp(6)
+            bottomMargin = dp(6)
+        }
         return card
     }
 
@@ -303,27 +315,35 @@ class CustomerActivity : AppCompatActivity() {
 
     private fun basketLineCard(index: Int, line: BasketLine): View {
         val row = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(12), dp(12), dp(12), dp(12))
             background = roundedBackground("#FFFFFF", 18)
             elevation = dp(1).toFloat()
         }
-        row.addView(title(line.item.name, 19f))
-        row.addView(body(line.customisation))
-        row.addView(body(getString(R.string.product_nutrition_short, line.item.calories)))
+        row.addView(ImageView(this).apply {
+            setImageResource(line.item.imageResId)
+            contentDescription = getString(R.string.product_image_description, line.item.name)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+        }, LinearLayout.LayoutParams(dp(64), dp(64)).apply { marginEnd = dp(10) })
+        val details = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        details.addView(title(line.item.name, 18f))
+        details.addView(body(line.customisation.take(80)))
+        details.addView(body(getString(R.string.product_nutrition_short, line.item.calories)))
         val controls = horizontalRow()
-        controls.addView(actionButton("-") {
+        controls.addView(secondaryButton("-") {
             if (line.quantity > 1) line.quantity-- else basket.removeAt(index)
             showTab(Tab.BASKET)
-        }, LinearLayout.LayoutParams(0, dp(48), 1f))
+        }, LinearLayout.LayoutParams(0, dp(40), 1f))
         controls.addView(body(getString(R.string.product_quantity, line.quantity)).apply {
             gravity = Gravity.CENTER
-        }, LinearLayout.LayoutParams(0, dp(48), 1f))
-        controls.addView(actionButton("+") {
+        }, LinearLayout.LayoutParams(0, dp(40), 1f))
+        controls.addView(secondaryButton("+") {
             line.quantity++
             showTab(Tab.BASKET)
-        }, LinearLayout.LayoutParams(0, dp(48), 1f))
-        row.addView(controls)
+        }, LinearLayout.LayoutParams(0, dp(40), 1f))
+        details.addView(controls)
+        row.addView(details, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         return row
     }
 
@@ -553,6 +573,17 @@ class CustomerActivity : AppCompatActivity() {
         setTextColor(Color.WHITE)
         background = roundedBackground("#6A35C9", 28)
         minHeight = dp(48)
+        stateListAnimator = null
+        setOnClickListener { action() }
+        contentDescription = label
+    }
+
+    private fun secondaryButton(label: String, action: () -> Unit) = Button(this).apply {
+        text = label
+        isAllCaps = false
+        setTextColor(Color.parseColor("#6A35C9"))
+        background = roundedBackground("#F0E9FF", 22)
+        minHeight = dp(40)
         stateListAnimator = null
         setOnClickListener { action() }
         contentDescription = label
