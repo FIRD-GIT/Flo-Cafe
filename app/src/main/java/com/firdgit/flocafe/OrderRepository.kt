@@ -15,6 +15,15 @@ class OrderRepository(
         val total: Double,
         val fingerprint: String = "",
         val createdAtMillis: Long? = null,
+        val items: List<OrderItemSummary> = emptyList(),
+    )
+
+    data class OrderItemSummary(
+        val menuItemId: String,
+        val name: String,
+        val unitPrice: Double,
+        val quantity: Int,
+        val customisation: String,
     )
 
     suspend fun submitOrder(lines: List<BasketLine>): String {
@@ -100,6 +109,18 @@ class OrderRepository(
             total = document.getDouble("total") ?: 0.0,
             fingerprint = document.getString("fingerprint").orEmpty(),
             createdAtMillis = document.getTimestamp("createdAt")?.toDate()?.time,
+            items = (document.get("items") as? List<*>)
+                .orEmpty()
+                .mapNotNull { item ->
+                    val values = item as? Map<*, *> ?: return@mapNotNull null
+                    OrderItemSummary(
+                        menuItemId = values["menuItemId"]?.toString().orEmpty(),
+                        name = values["nameSnapshot"]?.toString().orEmpty(),
+                        unitPrice = (values["unitPrice"] as? Number)?.toDouble() ?: 0.0,
+                        quantity = (values["quantity"] as? Number)?.toInt() ?: 0,
+                        customisation = values["customisation"]?.toString().orEmpty(),
+                    )
+                },
         )
 
 }

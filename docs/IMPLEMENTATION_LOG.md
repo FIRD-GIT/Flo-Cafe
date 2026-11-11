@@ -52,6 +52,17 @@ Each feature entry should explain:
 
 Add dated entries below as implementation begins. Do not mark a feature complete until the code location, visible behaviour, and validation evidence are recorded.
 
+## 2026-11-11 — Friendly order history and visual flow
+
+- **Status:** Implemented and build-verified.
+- **Requirement links:** PRD FR-08, FR-09, NFR-01, NFR-02; CAFE-08, CAFE-09, CAFE-18.
+- **Purpose and user value:** make previous orders understandable at a glance and keep technical identifiers out of the primary customer-facing summary.
+- **Decision and rationale:** order cards now show the first ordered product image, a short `Order #ABC123` reference, item names/quantities, status, date and total. Tapping a card opens the detailed items/customisations, total and internal Firestore reference. Rounded cards and buttons create a more continuous visual hierarchy than the previous flat vertical blocks.
+- **Code location:** `OrderRepository.kt`, `CustomerActivity.kt`, and `strings.xml`.
+- **Code-to-screen translation:** Firestore item snapshots are parsed into order item summaries; the Profile order history and Home status cards render the customer summary, while the detail dialog exposes the underlying order information on demand.
+- **Validation:** Firebase-enabled `assembleDebug` and `testDebugUnitTest` pass. The order card/detail code compiles against the existing Firestore order schema.
+- **Known limitations:** a live order-history screenshot requires a Firebase account with at least one stored order.
+
 ## 2026-11-11 — Pricing consistency and conditional customisation
 
 - **Status:** Implemented and build-verified.

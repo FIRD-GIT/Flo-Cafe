@@ -2,6 +2,7 @@ package com.firdgit.flocafe
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -18,6 +19,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class CustomerActivity : AppCompatActivity() {
     companion object {
@@ -184,7 +188,8 @@ class CustomerActivity : AppCompatActivity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(12), dp(12), dp(12), dp(12))
-            setBackgroundColor(Color.WHITE)
+            background = roundedBackground("#FFFFFF", 18)
+            elevation = dp(1).toFloat()
         }
         val image = ImageView(this).apply {
             setImageResource(item.imageResId)
@@ -282,7 +287,8 @@ class CustomerActivity : AppCompatActivity() {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(12), dp(12), dp(12), dp(12))
-            setBackgroundColor(Color.WHITE)
+            background = roundedBackground("#FFFFFF", 18)
+            elevation = dp(1).toFloat()
         }
         row.addView(title(line.item.name, 19f))
         row.addView(body(line.customisation))
@@ -323,8 +329,89 @@ class CustomerActivity : AppCompatActivity() {
         addView(actionButton(getString(R.string.sign_out)) { signOut() })
     }
 
-    private fun orderCard(order: OrderRepository.OrderSummary): View =
-        body(getString(R.string.order_summary, order.id, order.status, order.total, orderProgress(order.status)))
+    private fun orderCard(order: OrderRepository.OrderSummary): View {
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(14), dp(14), dp(14), dp(14))
+            background = roundedBackground("#FFFFFF", 18)
+            elevation = dp(2).toFloat()
+            setOnClickListener { showOrderDetails(order) }
+            contentDescription = getString(R.string.order_card_description, orderDisplayReference(order))
+        }
+        val firstItem = order.items.firstOrNull()
+        val image = ImageView(this).apply {
+            setImageResource(
+                MenuRepository().availableItems()
+                    .firstOrNull { it.id == firstItem?.menuItemId }
+                    ?.imageResId
+                    ?: R.drawable.product_latte,
+            )
+            contentDescription = getString(
+                R.string.order_image_description,
+                firstItem?.name ?: getString(R.string.order_default_item),
+            )
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+        }
+        card.addView(image, LinearLayout.LayoutParams(dp(72), dp(72)).apply {
+            marginEnd = dp(12)
+        })
+        val details = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        details.addView(title(orderDisplayReference(order), 18f))
+        details.addView(
+            body(
+                getString(
+                    R.string.order_card_items,
+                    order.items.joinToString(", ") { "${it.name} x${it.quantity}" }
+                        .ifBlank { getString(R.string.order_default_item) },
+                ),
+            ),
+        )
+        details.addView(body(getString(R.string.order_card_meta, order.status, orderDate(order))))
+        details.addView(body(PriceFormatter.format(order.total)))
+        card.addView(details, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        return card
+    }
+
+    private fun showOrderDetails(order: OrderRepository.OrderSummary) {
+        val details = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), 0, dp(20), 0)
+        }
+        details.addView(body(getString(R.string.order_detail_reference, orderDisplayReference(order))))
+        details.addView(body(getString(R.string.order_detail_date, orderDate(order))))
+        details.addView(body(getString(R.string.order_detail_status, order.status)))
+        details.addView(sectionTitle(getString(R.string.order_detail_items_heading)))
+        order.items.forEach { item ->
+            details.addView(
+                body(
+                    getString(
+                        R.string.order_detail_item,
+                        item.name,
+                        item.quantity,
+                        PriceFormatter.format(item.unitPrice),
+                        item.customisation,
+                    ),
+                ),
+            )
+        }
+        details.addView(sectionTitle(getString(R.string.order_detail_total_heading)))
+        details.addView(title(PriceFormatter.format(order.total), 22f))
+        details.addView(body(getString(R.string.order_detail_full_reference, order.id)))
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.order_detail_title, orderDisplayReference(order)))
+            .setView(details)
+            .setPositiveButton(R.string.close, null)
+            .show()
+    }
+
+    private fun orderDisplayReference(order: OrderRepository.OrderSummary): String =
+        getString(R.string.order_short_reference, order.id.takeLast(6).uppercase(Locale.UK))
+
+    private fun orderDate(order: OrderRepository.OrderSummary): String =
+        order.createdAtMillis?.let {
+            SimpleDateFormat("d MMM yyyy, HH:mm", Locale.UK).format(Date(it))
+        } ?: getString(R.string.order_date_pending)
 
     private fun addItemToBasket(item: MenuItem, customisation: String) {
         val existing = basket.firstOrNull {
@@ -446,10 +533,18 @@ class CustomerActivity : AppCompatActivity() {
         text = label
         isAllCaps = false
         setTextColor(Color.WHITE)
-        setBackgroundColor(Color.parseColor("#6A35C9"))
+        background = roundedBackground("#6A35C9", 28)
+        minHeight = dp(48)
+        stateListAnimator = null
         setOnClickListener { action() }
         contentDescription = label
     }
+
+    private fun roundedBackground(color: String, radius: Int) =
+        GradientDrawable().apply {
+            setColor(Color.parseColor(color))
+            cornerRadius = dp(radius).toFloat()
+        }
 
     private fun basketTotal(): Double =
         basket.sumOf { it.item.price * it.quantity }
