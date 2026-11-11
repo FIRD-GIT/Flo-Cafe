@@ -11,6 +11,14 @@ class MenuRepository {
             customisationOptions = listOf("Standard", "Less sugar", "Extra shot"),
             imageResId = R.drawable.product_latte,
             calories = 114,
+            customisationGroups = listOf(
+                CustomisationGroup("Size", listOf("Regular", "Large")),
+                CustomisationGroup("Milk", listOf("Semi-skimmed", "Oat", "Soya", "Almond")),
+                CustomisationGroup("Espresso shots", listOf("Standard", "Extra shot")),
+                CustomisationGroup("Sweetness", listOf("Regular sweetness", "Less sweet", "Unsweetened")),
+                CustomisationGroup("Syrup", listOf("No syrup", "Vanilla", "Caramel")),
+                CustomisationGroup("Topping", listOf("No topping", "Whipped cream")),
+            ),
         ),
         MenuItem(
             id = "americano",
@@ -21,6 +29,11 @@ class MenuRepository {
             customisationOptions = listOf("Standard", "Less sugar", "Extra shot"),
             imageResId = R.drawable.product_americano,
             calories = 9,
+            customisationGroups = listOf(
+                CustomisationGroup("Size", listOf("Regular", "Large")),
+                CustomisationGroup("Espresso shots", listOf("Standard", "Extra shot")),
+                CustomisationGroup("Sweetness", listOf("Regular sweetness", "Less sweet", "Unsweetened")),
+            ),
         ),
         MenuItem(
             id = "mocha",
@@ -30,6 +43,13 @@ class MenuRepository {
             category = "Hot Drinks",
             imageResId = R.drawable.product_mocha,
             calories = 238,
+            customisationGroups = listOf(
+                CustomisationGroup("Size", listOf("Regular", "Large")),
+                CustomisationGroup("Milk", listOf("Semi-skimmed", "Oat", "Soya", "Almond")),
+                CustomisationGroup("Espresso shots", listOf("Standard", "Extra shot")),
+                CustomisationGroup("Chocolate sauce", listOf("Standard", "Extra chocolate")),
+                CustomisationGroup("Topping", listOf("Whipped cream", "No whipped cream")),
+            ),
         ),
         MenuItem(
             id = "chai",
@@ -40,6 +60,11 @@ class MenuRepository {
             imageResId = R.drawable.product_latte,
             calories = 180,
             shotOptions = listOf("No espresso", "Extra shot"),
+            customisationGroups = listOf(
+                CustomisationGroup("Size", listOf("Regular", "Large")),
+                CustomisationGroup("Milk", listOf("Semi-skimmed", "Oat", "Soya", "Almond")),
+                CustomisationGroup("Sweetness", listOf("Regular sweetness", "Less sweet", "Unsweetened")),
+            ),
         ),
         MenuItem(
             id = "iced-latte",
@@ -50,6 +75,13 @@ class MenuRepository {
             imageResId = R.drawable.product_iced_latte,
             calories = 165,
             temperatureOptions = listOf("Iced"),
+            customisationGroups = listOf(
+                CustomisationGroup("Size", listOf("Regular", "Large")),
+                CustomisationGroup("Milk", listOf("Semi-skimmed", "Oat", "Soya", "Almond")),
+                CustomisationGroup("Espresso shots", listOf("Standard", "Extra shot")),
+                CustomisationGroup("Syrup", listOf("Vanilla", "Caramel", "No syrup")),
+                CustomisationGroup("Ice", listOf("Regular ice", "Less ice")),
+            ),
         ),
         MenuItem(
             id = "berry-cooler",
@@ -62,6 +94,10 @@ class MenuRepository {
             milkOptions = listOf("No milk"),
             shotOptions = listOf("No espresso"),
             temperatureOptions = listOf("Chilled"),
+            customisationGroups = listOf(
+                CustomisationGroup("Ice", listOf("Regular ice", "Less ice")),
+                CustomisationGroup("Sweetness", listOf("Regular sweetness", "Less sweet")),
+            ),
         ),
         MenuItem(
             id = "hot-chocolate",
@@ -72,6 +108,11 @@ class MenuRepository {
             imageResId = R.drawable.product_mocha,
             calories = 210,
             shotOptions = listOf("No espresso", "Extra shot"),
+            customisationGroups = listOf(
+                CustomisationGroup("Size", listOf("Regular", "Large")),
+                CustomisationGroup("Milk", listOf("Semi-skimmed", "Oat", "Soya", "Almond")),
+                CustomisationGroup("Topping", listOf("Whipped cream", "No whipped cream")),
+            ),
         ),
         MenuItem(
             id = "cookie",
@@ -140,6 +181,10 @@ class MenuRepository {
             sweetnessOptions = listOf("Standard"),
             syrupOptions = listOf("No syrup"),
             toppingOptions = listOf("Standard filling", "Extra cheese", "No tomato"),
+            customisationGroups = listOf(
+                CustomisationGroup("Preparation", listOf("Chilled", "Toasted")),
+                CustomisationGroup("Ingredients", listOf("Standard filling", "Extra cheese", "No tomato")),
+            ),
         ),
         MenuItem(
             id = "cheese-toastie",
@@ -156,6 +201,10 @@ class MenuRepository {
             sweetnessOptions = listOf("Standard"),
             syrupOptions = listOf("No syrup"),
             toppingOptions = listOf("Standard filling", "Extra cheese"),
+            customisationGroups = listOf(
+                CustomisationGroup("Preparation", listOf("Toasted")),
+                CustomisationGroup("Ingredients", listOf("Standard filling", "Extra cheese")),
+            ),
         ),
     )
 }

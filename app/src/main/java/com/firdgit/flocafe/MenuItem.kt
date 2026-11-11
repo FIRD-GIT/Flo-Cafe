@@ -19,6 +19,12 @@ data class MenuItem(
     val sweetnessOptions: List<String> = listOf("Regular sweetness", "Less sweet", "Unsweetened"),
     val syrupOptions: List<String> = listOf("No syrup", "Vanilla", "Caramel"),
     val toppingOptions: List<String> = listOf("No topping", "Whipped cream"),
+    val customisationGroups: List<CustomisationGroup> = emptyList(),
+)
+
+data class CustomisationGroup(
+    val title: String,
+    val options: List<String>,
 )
 
 data class BasketLine(

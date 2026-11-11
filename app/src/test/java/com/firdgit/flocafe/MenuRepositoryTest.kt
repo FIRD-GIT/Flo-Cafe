@@ -34,4 +34,19 @@ class MenuRepositoryTest {
         assertTrue(items.first { it.id == "chicken-sandwich" }.isCustomisable)
         assertTrue(items.first { it.id == "chicken-sandwich" }.toppingOptions.contains("Extra cheese"))
     }
+
+    @Test
+    fun customisationGroupsMatchTheProductType() {
+        val latte = items.first { it.id == "latte" }
+        val sandwich = items.first { it.id == "chicken-sandwich" }
+        val cookie = items.first { it.id == "cookie" }
+
+        assertTrue(latte.customisationGroups.any { it.title == "Milk" })
+        assertTrue(latte.customisationGroups.any { it.title == "Espresso shots" })
+        assertEquals(
+            setOf("Preparation", "Ingredients"),
+            sandwich.customisationGroups.map { it.title }.toSet(),
+        )
+        assertTrue(cookie.customisationGroups.isEmpty())
+    }
 }

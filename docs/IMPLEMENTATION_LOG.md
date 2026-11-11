@@ -52,6 +52,17 @@ Each feature entry should explain:
 
 Add dated entries below as implementation begins. Do not mark a feature complete until the code location, visible behaviour, and validation evidence are recorded.
 
+## 2026-11-11 — Spaced categories and product-specific customisation
+
+- **Status:** Implemented and build-verified.
+- **Requirement links:** PRD FR-03, FR-18, NFR-01; CAFE-04, CAFE-21.
+- **Purpose and user value:** improve category readability and ensure customers only see customisation choices that make sense for the selected item.
+- **Decision and rationale:** Home categories now use separated full-width rounded actions, while Menu categories use horizontally scrollable, spaced chips so long labels do not overlap. Each customisable product now declares its own groups: drinks can expose size, milk, shots, sweetness, syrup, ice or toppings; sandwiches expose preparation and ingredient choices such as extra cheese or no tomato; fixed sweet treats continue to add directly without a customisation prompt.
+- **Code location:** `MenuItem.kt`, `MenuRepository.kt`, `CustomerActivity.kt`, and `MenuRepositoryTest.kt`.
+- **Code-to-screen translation:** the product dialog is generated from the selected item's `customisationGroups`, rather than displaying irrelevant fields such as milk or espresso shots for a sandwich.
+- **Validation:** `assembleDebug` and `testDebugUnitTest` pass; emulator UI inspection confirmed the spaced category labels and expanded item-specific menu model.
+- **Known limitations:** customisation options are currently local coursework data and use single-choice selectors; multi-select ingredient editing can be added if the product requirements expand.
+
 ## 2026-11-11 — Friendly order history and visual flow
 
 - **Status:** Implemented and build-verified.

@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -125,9 +126,16 @@ class CustomerActivity : AppCompatActivity() {
             getString(R.string.category_sweet_treats),
             getString(R.string.category_sandwiches),
         ).forEach { category ->
-            addView(actionButton(category) {
-                showTab(Tab.MENU)
-            })
+            addView(
+                actionButton(category) { showTab(Tab.MENU) },
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(56),
+                ).apply {
+                    topMargin = dp(6)
+                    bottomMargin = dp(6)
+                },
+            )
         }
         addView(sectionTitle(getString(R.string.order_status_heading)))
         if (orders.isEmpty()) {
@@ -150,13 +158,24 @@ class CustomerActivity : AppCompatActivity() {
             getString(R.string.category_sweet_treats),
             getString(R.string.category_sandwiches),
         )
-        val categoryRow = horizontalRow()
+        val categoryRow = horizontalRow().apply {
+            setPadding(dp(2), dp(4), dp(2), dp(8))
+        }
         categories.forEach { category ->
             categoryRow.addView(actionButton(category) {
                 renderMenuItems(category)
-            }, LinearLayout.LayoutParams(0, dp(48), 1f).apply { marginEnd = dp(4) })
+            }, LinearLayout.LayoutParams(
+                dp(if (category.length > 10) 150 else 92),
+                dp(52),
+            ).apply {
+                marginStart = dp(4)
+                marginEnd = dp(4)
+            })
         }
-        addView(categoryRow)
+        addView(HorizontalScrollView(this@CustomerActivity).apply {
+            isHorizontalScrollBarEnabled = false
+            addView(categoryRow)
+        })
         addView(menuItemsContainer())
     }
 
@@ -223,30 +242,28 @@ class CustomerActivity : AppCompatActivity() {
             setPadding(dp(20), dp(4), dp(20), 0)
         }
         form.addView(body(getString(R.string.nutrition_estimate_notice, item.nutritionNote)))
-        val selections = linkedMapOf(
-            getString(R.string.option_size) to item.sizeOptions,
-            getString(R.string.option_milk) to item.milkOptions,
-            getString(R.string.option_shots) to item.shotOptions,
-            getString(R.string.option_temperature) to item.temperatureOptions,
-            getString(R.string.option_sweetness) to item.sweetnessOptions,
-            getString(R.string.option_syrup) to item.syrupOptions,
-            getString(R.string.option_topping) to item.toppingOptions,
-        )
-        val spinners = selections.map { (label, values) ->
-            form.addView(body(label))
+        val groups = item.customisationGroups.ifEmpty {
+            listOf(
+                CustomisationGroup(getString(R.string.option_size), item.sizeOptions),
+                CustomisationGroup(getString(R.string.option_milk), item.milkOptions),
+                CustomisationGroup(getString(R.string.option_shots), item.shotOptions),
+                CustomisationGroup(getString(R.string.option_temperature), item.temperatureOptions),
+                CustomisationGroup(getString(R.string.option_sweetness), item.sweetnessOptions),
+                CustomisationGroup(getString(R.string.option_syrup), item.syrupOptions),
+                CustomisationGroup(getString(R.string.option_topping), item.toppingOptions),
+            )
+        }
+        val spinners = groups.map { group ->
+            form.addView(body(group.title))
             Spinner(this).also { spinner ->
                 spinner.adapter = ArrayAdapter(
                     this,
                     android.R.layout.simple_spinner_item,
-                    values,
+                    group.options,
                 ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
                 form.addView(spinner)
             }
         }
-        val whippedCream = CheckBox(this).apply {
-            text = getString(R.string.option_whipped_cream)
-        }
-        form.addView(whippedCream)
         form.addView(body(getString(R.string.nutrition_summary, item.calories)))
 
         AlertDialog.Builder(this)
@@ -254,9 +271,10 @@ class CustomerActivity : AppCompatActivity() {
             .setView(form)
             .setNegativeButton(R.string.cancel_order, null)
             .setPositiveButton(R.string.add_to_basket) { _, _ ->
-                val summary = selections.keys.zip(spinners.map { it.selectedItem.toString() })
-                    .joinToString(", ") { (label, value) -> "$label: $value" } +
-                    if (whippedCream.isChecked) ", ${getString(R.string.option_whipped_cream)}" else ""
+                val summary = groups.zip(spinners)
+                    .joinToString(", ") { (group, spinner) ->
+                        "${group.title}: ${spinner.selectedItem}"
+                    }
                 addItemToBasket(item, summary)
             }
             .show()
