@@ -31,6 +31,15 @@ class MainActivity : AppCompatActivity() {
             roleText.text = getString(R.string.firebase_configuration_required)
             statusText.text = getString(R.string.firebase_setup_hint)
             setAuthenticationEnabled(false)
+            findViewById<Button>(R.id.demoMenuButton).apply {
+                visibility = android.view.View.VISIBLE
+                setOnClickListener {
+                    startActivity(
+                        Intent(this@MainActivity, CustomerActivity::class.java)
+                            .putExtra(CustomerActivity.EXTRA_DEMO_MODE, true),
+                    )
+                }
+            }
             return
         }
 

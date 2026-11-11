@@ -9,6 +9,10 @@
     <string name="role_admin">Sub-admin access</string>
     <string name="firebase_configuration_required">Add google-services.json to connect Firebase.</string>
     <string name="firebase_setup_hint">Authentication is disabled until the Firebase project is connected.</string>
+    <string name="open_demo_menu">Open local demo menu</string>
+    <string name="demo_mode_message">Demo mode: menu, categories, images, customisation and basket preview are available. Firebase is required for accounts and orders.</string>
+    <string name="demo_checkout_disabled">Checkout requires Firebase</string>
+    <string name="demo_orders_disabled">Orders are unavailable in local demo mode.</string>
     <string name="authentication_required">Sign in or register to continue.</string>
     <string name="authentication_in_progress">Connecting to Firebase…</string>
     <string name="authentication_success">Authentication successful.</string>

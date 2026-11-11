@@ -62,4 +62,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/register_customer" />
+
+    <Button
+        android:id="@+id/demoMenuButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/open_demo_menu"
+        android:visibility="gone" />
 </LinearLayout>

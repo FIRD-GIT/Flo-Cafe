@@ -16,6 +16,10 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
 class CustomerActivity : AppCompatActivity() {
+    companion object {
+        const val EXTRA_DEMO_MODE = "demo_mode"
+    }
+
     private lateinit var statusText: TextView
     private lateinit var menuContainer: LinearLayout
     private lateinit var basketText: TextView
@@ -27,6 +31,7 @@ class CustomerActivity : AppCompatActivity() {
     private val basket = mutableMapOf<String, BasketLine>()
     private val quantityLabels = mutableMapOf<String, TextView>()
     private var isSubmitting = false
+    private val isDemoMode by lazy { intent.getBooleanExtra(EXTRA_DEMO_MODE, false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,9 +46,16 @@ class CustomerActivity : AppCompatActivity() {
         orderRepository = OrderRepository(userRepository)
 
         findViewById<Button>(R.id.logoutButton).setOnClickListener { signOut() }
-        loadCustomerGreeting()
         showCustomerMenu()
-        loadCustomerOrders()
+        if (isDemoMode) {
+            statusText.text = getString(R.string.demo_mode_message)
+            checkoutButton.isEnabled = false
+            checkoutButton.text = getString(R.string.demo_checkout_disabled)
+            ordersText.text = getString(R.string.demo_orders_disabled)
+        } else {
+            loadCustomerGreeting()
+            loadCustomerOrders()
+        }
     }
 
     private fun loadCustomerGreeting() {
