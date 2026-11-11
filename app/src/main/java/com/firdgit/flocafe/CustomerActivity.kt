@@ -428,6 +428,7 @@ class CustomerActivity : AppCompatActivity() {
         details.addView(body(getString(R.string.order_card_meta, order.status, orderDate(order))))
         details.addView(body(PriceFormatter.format(order.total)))
         card.addView(details, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        card.layoutParams = spacedParams(top = 8, bottom = 8)
         return card
     }
 
