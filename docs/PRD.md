@@ -125,11 +125,11 @@ Completed order → rate service/products → submit feedback → confirmation.
 |---|---|---|
 | FR-01 | The customer can register with a valid email address and password. | Must |
 | FR-02 | The customer can log in, remain signed in across app restarts, and log out. | Must |
-| FR-03 | The customer can browse products with name, description, price, category, and availability. | Must |
+| FR-03 | The customer can browse products with name, description, price, category, availability, imagery, and controlled customisation choices. | Must |
 | FR-04 | The customer can search or filter available products. | Must |
 | FR-05 | The customer can add products to a basket and change quantities. | Must |
 | FR-06 | The customer can remove products and see an updated total. | Must |
-| FR-07 | The customer can submit a valid order and receive a confirmation reference. | Must |
+| FR-07 | The customer can submit a valid order and receive a confirmation reference; a recent matching order requires explicit confirmation before another submission. | Must |
 | FR-08 | The customer can view the current order and its status. | Must |
 | FR-09 | The customer can view previous orders and their details. | Should |
 | FR-10 | The customer can submit a rating and written feedback for an eligible order. | Should |
@@ -193,13 +193,13 @@ These are initial decisions, not permission to implement every technology at onc
 
 ### Menu and basket
 
-- Given available menu data, the customer can browse categories and see price and availability.
+- Given available menu data, the customer can browse logical categories, see product imagery, price and availability, and choose supported customisations.
 - Given a search term, only matching products are shown, with a clear empty state if there are no matches.
 - Given an available item, adding it updates the basket quantity and total; removing the final item returns the basket to an empty state.
 
 ### Checkout and tracking
 
-- Given a non-empty basket and valid checkout data, an order is persisted once and a confirmation reference is shown.
+- Given a non-empty basket and valid checkout data, an order is persisted once and a confirmation reference is shown. A recent matching order is highlighted and requires explicit confirmation.
 - Given an unavailable item or persistence failure, checkout is blocked or reported as failed without showing a false confirmation.
 - Given a status change, the current-order view displays the new status and the customer can find the order in history after completion.
 - Given an order in preparation, the coffee-cup indicator shows the corresponding progress level; when the order reaches Ready for Collection or the final completion state, the cup is full and a notification is shown or recorded.

@@ -219,4 +219,19 @@ The Firebase Console setup is now at the point where the following must be teste
 5. Sign back in as the customer and confirm the updated status.
 6. Capture screenshots or a short recording for Thursday's evidence.
 
+## 9. Eight Vs of Big Data in the refined workflow
+
+The app uses the eight Vs as an analysis framework rather than pretending that a small coursework dataset is already “big data”.
+
+- **Volume:** The current release contains a deliberately small menu and order set. The Firestore order model can represent many orders without changing the customer workflow.
+- **Velocity:** Order statuses change during preparation, so the customer-facing order view must reflect operational updates over time.
+- **Variety:** User profiles, order snapshots, categories, customisations, prices, timestamps and status values have different structures and purposes.
+- **Veracity:** Item and price snapshots preserve what was submitted; status values are allow-listed; a deterministic fingerprint checks for a recent matching order; Firestore rules preserve order ownership, totals and item snapshots.
+- **Value:** Each stored field supports authentication, fulfilment, preparation, collection or support. Optional profiling is not required for the core value.
+- **Variability:** Quantities, customisations, menu availability and preparation states differ between orders and must not be assumed to be constant.
+- **Visualisation:** Category headings, product illustrations, quantity indicators, basket summaries and status progress make stored data understandable to customers and sub-admins.
+- **Vulnerability:** Customer reads are restricted to owned orders, administrative operations are role-protected, Firebase handles passwords, and the current release does not request optional location, photo or AI data.
+
+The duplicate-order check is the clearest Veracity safeguard in the refined release: it identifies a recent matching basket and asks the customer to confirm rather than silently creating a second order. This reduces an avoidable data-quality error while preserving customer choice.
+
 AI analysis and previous-order suggestions are not required for this Thursday slice and should be scheduled after the core flow has been demonstrated.

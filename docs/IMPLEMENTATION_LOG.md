@@ -52,6 +52,29 @@ Each feature entry should explain:
 
 Add dated entries below as implementation begins. Do not mark a feature complete until the code location, visible behaviour, and validation evidence are recorded.
 
+## 2026-11-11 — Veracity and usability refinement
+
+- **Status:** Implemented and build-verified.
+- **Requirement links:** PRD FR-03, FR-06, FR-07, FR-08, NFR-01, NFR-04; CAFE-04, CAFE-06, CAFE-07, CAFE-08, CAFE-15, CAFE-18.
+- **Purpose and user value:** respond to client feedback by making product discovery clearer, reducing accidental sign-out, supporting meaningful product choices, and preventing a recent matching order from being submitted without confirmation.
+- **Decision and rationale:** group the local menu by category, show a stable product row with a product illustration, expose controlled customisation choices, and update quantity labels rather than creating duplicate product rows. A deterministic order fingerprint compares item, quantity and customisation values within a ten-minute window; a matching order triggers confirmation rather than silent rejection.
+- **Code location:** `MenuItem.kt`, `MenuRepository.kt`, `CustomerActivity.kt`, `OrderRepository.kt`, `activity_customer.xml`, `strings.xml`, and product vector drawables.
+- **Code-to-screen translation:** customers see Coffee and Bakery sections, product imagery, descriptions, customisation selectors, an add action, and a quantity indicator. The basket summary lists the selected customisations. Checkout checks for a recent matching order and asks the customer to confirm. Sign-out is visually secondary and requires confirmation. Customer orders now render status cards with a four-step preparation progress bar and a clear ready/collected message.
+- **Validation:** `./gradlew :app:assembleDebug` succeeded; the APK installed successfully on the Android emulator; UI accessibility text was inspected with `uiautomator`.
+- **Known limitations:** menu data remains local and product images are vector illustrations rather than remote photographs. The duplicate check depends on the stored fingerprint and skips legacy orders created before this field existed.
+- **Commit reference:** to be added after the next feature commit.
+
+## 2026-11-11 — Eight Vs of Big Data mapping
+
+- **Volume:** the current prototype intentionally uses a small dataset; the order repository and Firestore structure provide a clear path to multi-order and multi-branch evidence without claiming production scale.
+- **Velocity:** order status changes move through a controlled sequence and are reloaded for the customer, showing how operational data changes over time.
+- **Variety:** account profiles, order item snapshots, categories, customisations and status values are handled as different data types.
+- **Veracity:** item snapshots preserve what was ordered, status values are allow-listed, duplicate fingerprints flag a recent matching order, and Firestore rules protect ownership and totals.
+- **Value:** the data directly supports accurate checkout, preparation and collection decisions rather than unnecessary profiling.
+- **Variability:** menu availability, quantities, customisations and preparation states can differ between orders.
+- **Visualisation:** category headings, product illustrations, quantity indicators, basket summaries and four-step cup-progress bars make data understandable to the user.
+- **Vulnerability:** customer access is limited to owned orders, admin operations are role-protected, Firebase handles passwords, and optional location/photo/AI data is not collected by this release.
+
 ## 2026-11-04 — Firebase user-role foundation
 
 - **Status:** Foundation implemented; Firebase project configuration and emulator verification remain pending.

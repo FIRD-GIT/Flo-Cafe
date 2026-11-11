@@ -13,6 +13,8 @@ class OrderRepository(
         val id: String,
         val status: String,
         val total: Double,
+        val fingerprint: String = "",
+        val createdAtMillis: Long? = null,
     )
 
     suspend fun submitOrder(lines: List<BasketLine>): String {
@@ -28,6 +30,7 @@ class OrderRepository(
                 "nameSnapshot" to line.item.name,
                 "unitPrice" to line.item.price,
                 "quantity" to line.quantity,
+                "customisation" to line.customisation,
             )
         }
         order.set(
@@ -37,28 +40,28 @@ class OrderRepository(
                 "status" to "Pending",
                 "total" to lines.sumOf { it.item.price * it.quantity },
                 "items" to items,
+                "fingerprint" to OrderFingerprint.from(lines),
             ),
         ).await()
         return order.id
     }
 
+    suspend fun findRecentDuplicate(
+        lines: List<BasketLine>,
+        withinMinutes: Long = 10,
+    ): OrderSummary? {
+        val wantedFingerprint = OrderFingerprint.from(lines)
+        val cutoff = System.currentTimeMillis() - (withinMinutes * 60_000)
+        return customerOrders().firstOrNull {
+            it.fingerprint == wantedFingerprint &&
+                it.createdAtMillis != null &&
+                it.createdAtMillis >= cutoff
+        }
+    }
+
     suspend fun currentCustomerOrders(): List<OrderSummary> {
         check(userRepository.isFirebaseConfigured) { "Firebase is not configured for this build." }
-        val customerUid = requireNotNull(userRepository.currentUserId) {
-            "Sign in before loading orders."
-        }
-        return firestore.collection("orders")
-            .whereEqualTo("customerUid", customerUid)
-            .get()
-            .await()
-            .documents
-            .map { document ->
-                OrderSummary(
-                    id = document.id,
-                    status = document.getString("status").orEmpty(),
-                    total = document.getDouble("total") ?: 0.0,
-                )
-            }
+        return customerOrders()
     }
 
     suspend fun allOrders(): List<OrderSummary> {
@@ -67,13 +70,7 @@ class OrderRepository(
             .get()
             .await()
             .documents
-            .map { document ->
-                OrderSummary(
-                    id = document.id,
-                    status = document.getString("status").orEmpty(),
-                    total = document.getDouble("total") ?: 0.0,
-                )
-            }
+            .map(::toOrderSummary)
     }
 
     suspend fun updateStatus(orderId: String, status: String) {
@@ -83,4 +80,26 @@ class OrderRepository(
         check(userRepository.isFirebaseConfigured) { "Firebase is not configured for this build." }
         firestore.collection("orders").document(orderId).update("status", status).await()
     }
+
+    private suspend fun customerOrders(): List<OrderSummary> {
+        val customerUid = requireNotNull(userRepository.currentUserId) {
+            "Sign in before loading orders."
+        }
+        return firestore.collection("orders")
+            .whereEqualTo("customerUid", customerUid)
+            .get()
+            .await()
+            .documents
+            .map(::toOrderSummary)
+    }
+
+    private fun toOrderSummary(document: com.google.firebase.firestore.DocumentSnapshot): OrderSummary =
+        OrderSummary(
+            id = document.id,
+            status = document.getString("status").orEmpty(),
+            total = document.getDouble("total") ?: 0.0,
+            fingerprint = document.getString("fingerprint").orEmpty(),
+            createdAtMillis = document.getTimestamp("createdAt")?.toDate()?.time,
+        )
+
 }

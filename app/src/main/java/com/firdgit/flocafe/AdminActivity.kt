@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -40,7 +41,13 @@ class AdminActivity : AppCompatActivity() {
                         getString(
                             R.string.admin_orders,
                             orders.joinToString("\n") {
-                                getString(R.string.order_summary, it.id, it.status, it.total)
+                                getString(
+                                    R.string.order_summary,
+                                    it.id,
+                                    it.status,
+                                    it.total,
+                                    orderProgress(it.status),
+                                )
                             },
                         )
                     }
@@ -80,8 +87,23 @@ class AdminActivity : AppCompatActivity() {
     }
 
     private fun signOut() {
-        userRepository.signOut()
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
+        AlertDialog.Builder(this)
+            .setTitle(R.string.sign_out_confirmation_title)
+            .setMessage(R.string.sign_out_confirmation_message)
+            .setNegativeButton(R.string.cancel_order, null)
+            .setPositiveButton(R.string.sign_out) { _, _ ->
+                userRepository.signOut()
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+            .show()
+    }
+
+    private fun orderProgress(status: String): String = when (status) {
+        "Pending" -> "1/4"
+        "Preparing" -> "2/4"
+        "Ready for Collection" -> "3/4"
+        "Collected" -> "4/4"
+        else -> "0/4"
     }
 }

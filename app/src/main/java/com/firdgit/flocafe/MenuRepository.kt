@@ -2,8 +2,32 @@ package com.firdgit.flocafe
 
 class MenuRepository {
     fun availableItems(): List<MenuItem> = listOf(
-        MenuItem("latte", "Café latte", "Espresso with steamed milk", 3.20),
-        MenuItem("americano", "Americano", "Espresso with hot water", 2.60),
-        MenuItem("banana-bread", "Banana bread", "Toasted slice with butter", 2.40),
+        MenuItem(
+            id = "latte",
+            name = "Café latte",
+            description = "Espresso with steamed milk",
+            price = 3.20,
+            category = "Coffee",
+            customisationOptions = listOf("Standard", "Less sugar", "Extra shot"),
+            imageResId = R.drawable.product_latte,
+        ),
+        MenuItem(
+            id = "americano",
+            name = "Americano",
+            description = "Espresso with hot water",
+            price = 2.60,
+            category = "Coffee",
+            customisationOptions = listOf("Standard", "Less sugar", "Extra shot"),
+            imageResId = R.drawable.product_americano,
+        ),
+        MenuItem(
+            id = "banana-bread",
+            name = "Banana bread",
+            description = "Toasted slice with butter",
+            price = 2.40,
+            category = "Bakery",
+            customisationOptions = listOf("Standard", "Toasted", "No butter"),
+            imageResId = R.drawable.product_banana_bread,
+        ),
     )
 }

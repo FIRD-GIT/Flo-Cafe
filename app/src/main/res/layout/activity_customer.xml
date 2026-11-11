@@ -17,14 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="@string/customer_landing_message" />
-
-    <Button
-        android:id="@+id/logoutButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/sign_out" />
+        android:text="@string/customer_landing_message"
+        android:importantForAccessibility="yes" />
 
     <TextView
         android:id="@+id/basketText"
@@ -32,7 +26,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/basket_empty"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:importantForAccessibility="yes" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -55,15 +50,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/checkout_preview_button" />
+                android:text="@string/checkout_preview_button"
+                android:contentDescription="@string/checkout_description" />
 
-            <TextView
-                android:id="@+id/ordersText"
+            <LinearLayout
+                android:id="@+id/ordersContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/no_orders"
-                android:textStyle="bold" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/ordersText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_orders"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    <Button
+        android:id="@+id/logoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="8dp"
+        android:text="@string/sign_out"
+        android:contentDescription="@string/sign_out_description" />
 </LinearLayout>
