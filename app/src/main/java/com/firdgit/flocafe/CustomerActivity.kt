@@ -129,8 +129,14 @@ class CustomerActivity : AppCompatActivity() {
             orders.take(2).forEach { addView(orderCard(it)) }
         }
         addView(sectionTitle(getString(R.string.quick_actions_heading)))
-        addView(actionButton(getString(R.string.view_menu)) { showTab(Tab.MENU) })
-        addView(actionButton(getString(R.string.view_basket)) { showTab(Tab.BASKET) })
+        addView(
+            actionButton(getString(R.string.view_menu)) { showTab(Tab.MENU) },
+            spacedParams(top = 6, bottom = 5),
+        )
+        addView(
+            actionButton(getString(R.string.view_basket)) { showTab(Tab.BASKET) },
+            spacedParams(top = 5, bottom = 6),
+        )
     }
 
     private fun menuView(): View = verticalScroll {
@@ -296,7 +302,10 @@ class CustomerActivity : AppCompatActivity() {
         addView(title(getString(R.string.basket_heading), 28f))
         if (basket.isEmpty()) {
             addView(body(getString(R.string.basket_empty)))
-            addView(actionButton(getString(R.string.add_items)) { showTab(Tab.MENU) })
+            addView(
+                actionButton(getString(R.string.add_items)) { showTab(Tab.MENU) },
+                spacedParams(top = 12, bottom = 6),
+            )
             return@verticalScroll
         }
         basket.toList().forEachIndexed { index, line ->
@@ -304,13 +313,19 @@ class CustomerActivity : AppCompatActivity() {
         }
         addView(sectionTitle(getString(R.string.basket_total_heading)))
         addView(title(PriceFormatter.format(basketTotal()), 24f))
-        addView(actionButton(getString(R.string.checkout_preview_button)) {
-            checkForRecentDuplicate()
-        })
-        addView(actionButton(getString(R.string.clear_basket)) {
-            basket.clear()
-            showTab(Tab.BASKET)
-        })
+        addView(
+            actionButton(getString(R.string.checkout_preview_button)) {
+                checkForRecentDuplicate()
+            },
+            spacedParams(top = 12, bottom = 5),
+        )
+        addView(
+            secondaryButton(getString(R.string.clear_basket)) {
+                basket.clear()
+                showTab(Tab.BASKET)
+            },
+            spacedParams(top = 5, bottom = 6),
+        )
     }
 
     private fun basketLineCard(index: Int, line: BasketLine): View {
@@ -330,20 +345,25 @@ class CustomerActivity : AppCompatActivity() {
         details.addView(title(line.item.name, 18f))
         details.addView(body(line.customisation.take(80)))
         details.addView(body(getString(R.string.product_nutrition_short, line.item.calories)))
-        val controls = horizontalRow()
-        controls.addView(secondaryButton("-") {
+        val controls = horizontalRow().apply {
+            gravity = Gravity.END
+            setPadding(0, dp(6), 0, 0)
+        }
+        controls.addView(compactControlButton("-") {
             if (line.quantity > 1) line.quantity-- else basket.removeAt(index)
             showTab(Tab.BASKET)
-        }, LinearLayout.LayoutParams(0, dp(40), 1f))
+        }, LinearLayout.LayoutParams(dp(40), dp(36)).apply { marginEnd = dp(8) })
         controls.addView(body(getString(R.string.product_quantity, line.quantity)).apply {
             gravity = Gravity.CENTER
-        }, LinearLayout.LayoutParams(0, dp(40), 1f))
-        controls.addView(secondaryButton("+") {
+            setPadding(0, 0, 0, 0)
+        }, LinearLayout.LayoutParams(dp(28), dp(36)).apply { marginEnd = dp(8) })
+        controls.addView(compactControlButton("+") {
             line.quantity++
             showTab(Tab.BASKET)
-        }, LinearLayout.LayoutParams(0, dp(40), 1f))
+        }, LinearLayout.LayoutParams(dp(40), dp(36)))
         details.addView(controls)
         row.addView(details, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        row.layoutParams = spacedParams(top = 7, bottom = 7)
         return row
     }
 
@@ -540,7 +560,7 @@ class CustomerActivity : AppCompatActivity() {
             isFillViewport = true
             addView(LinearLayout(this@CustomerActivity).apply {
                 orientation = LinearLayout.VERTICAL
-                setPadding(dp(4), dp(12), dp(4), dp(24))
+                setPadding(dp(16), dp(16), dp(16), dp(32))
                 content()
             })
         }
@@ -554,17 +574,19 @@ class CustomerActivity : AppCompatActivity() {
         text = value
         textSize = size
         setTextColor(Color.parseColor("#24202B"))
-        setPadding(0, dp(8), 0, dp(8))
+        setPadding(0, dp(10), 0, dp(8))
         setTypeface(typeface, android.graphics.Typeface.BOLD)
     }
 
-    private fun sectionTitle(value: String) = title(value, 21f)
+    private fun sectionTitle(value: String) = title(value, 21f).apply {
+        layoutParams = spacedParams(top = 18, bottom = 5)
+    }
 
     private fun body(value: String) = TextView(this).apply {
         text = value
         textSize = 15f
         setTextColor(Color.parseColor("#6B6673"))
-        setPadding(0, dp(4), 0, dp(6))
+        setPadding(0, dp(4), 0, dp(8))
     }
 
     private fun actionButton(label: String, action: () -> Unit) = Button(this).apply {
@@ -572,7 +594,9 @@ class CustomerActivity : AppCompatActivity() {
         isAllCaps = false
         setTextColor(Color.WHITE)
         background = roundedBackground("#6A35C9", 28)
-        minHeight = dp(48)
+        minHeight = dp(44)
+        minimumHeight = dp(44)
+        setPadding(dp(16), 0, dp(16), 0)
         stateListAnimator = null
         setOnClickListener { action() }
         contentDescription = label
@@ -582,12 +606,36 @@ class CustomerActivity : AppCompatActivity() {
         text = label
         isAllCaps = false
         setTextColor(Color.parseColor("#6A35C9"))
-        background = roundedBackground("#F0E9FF", 22)
+        background = roundedBackground("#F0E9FF", 18)
         minHeight = dp(40)
+        minimumHeight = dp(40)
+        setPadding(dp(12), 0, dp(12), 0)
         stateListAnimator = null
         setOnClickListener { action() }
         contentDescription = label
     }
+
+    private fun compactControlButton(label: String, action: () -> Unit) = Button(this).apply {
+        text = label
+        isAllCaps = false
+        setTextColor(Color.parseColor("#6A35C9"))
+        background = roundedBackground("#F0E9FF", 12)
+        minHeight = 0
+        minimumHeight = 0
+        setPadding(0, 0, 0, 0)
+        stateListAnimator = null
+        setOnClickListener { action() }
+        contentDescription = label
+    }
+
+    private fun spacedParams(top: Int = 0, bottom: Int = 0) =
+        LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+        ).apply {
+            topMargin = dp(top)
+            bottomMargin = dp(bottom)
+        }
 
     private fun roundedBackground(color: String, radius: Int) =
         GradientDrawable().apply {
