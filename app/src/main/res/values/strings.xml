@@ -59,8 +59,8 @@
     <string name="category_sweet_treats">Sweet Treats</string>
     <string name="category_sandwiches">Sandwiches</string>
     <string name="product_card_details">%1$d kcal · %2$s</string>
-    <string name="price_format">£%1$s</string>
     <string name="customise_item">Customise</string>
+    <string name="standard_customisation">Standard</string>
     <string name="nutrition_estimate_notice">Nutrition: %1$s</string>
     <string name="nutrition_summary">Estimated energy: %1$d kcal per serving</string>
     <string name="product_nutrition_short">%1$d kcal estimated</string>

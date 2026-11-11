@@ -197,9 +197,15 @@ class CustomerActivity : AppCompatActivity() {
         val details = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         details.addView(title(item.name, if (compact) 18f else 20f))
         details.addView(body(getString(R.string.product_card_details, item.calories, item.description)))
-        details.addView(body(getString(R.string.price_format, item.price)))
-        val customise = actionButton(getString(R.string.customise_item)) {
-            showProductDetail(item)
+        details.addView(body(PriceFormatter.format(item.price)))
+        val customise = actionButton(
+            getString(if (item.isCustomisable) R.string.customise_item else R.string.add_to_basket),
+        ) {
+            if (item.isCustomisable) {
+                showProductDetail(item)
+            } else {
+                addItemToBasket(item, getString(R.string.standard_customisation))
+            }
         }
         details.addView(customise)
         card.addView(details, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
@@ -262,7 +268,7 @@ class CustomerActivity : AppCompatActivity() {
             addView(basketLineCard(index, line))
         }
         addView(sectionTitle(getString(R.string.basket_total_heading)))
-        addView(title(getString(R.string.price_format, basketTotal()), 24f))
+        addView(title(PriceFormatter.format(basketTotal()), 24f))
         addView(actionButton(getString(R.string.checkout_preview_button)) {
             checkForRecentDuplicate()
         })
@@ -445,8 +451,8 @@ class CustomerActivity : AppCompatActivity() {
         contentDescription = label
     }
 
-    private fun basketTotal(): String =
-        "%.2f".format(basket.sumOf { it.item.price * it.quantity })
+    private fun basketTotal(): Double =
+        basket.sumOf { it.item.price * it.quantity }
 
     private fun orderProgress(status: String): String = when (status) {
         "Pending" -> "1/4"

@@ -26,4 +26,12 @@ class MenuRepositoryTest {
         assertTrue(latte.nutritionNote.contains("not verified"))
         assertTrue(latte.calories > 0)
     }
+
+    @Test
+    fun fixedSweetTreatsDoNotRequireCustomisation() {
+        assertTrue(items.first { it.id == "cookie" }.isCustomisable.not())
+        assertTrue(items.first { it.id == "brownie" }.isCustomisable.not())
+        assertTrue(items.first { it.id == "chicken-sandwich" }.isCustomisable)
+        assertTrue(items.first { it.id == "chicken-sandwich" }.toppingOptions.contains("Extra cheese"))
+    }
 }

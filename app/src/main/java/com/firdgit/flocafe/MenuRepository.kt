@@ -81,6 +81,7 @@ class MenuRepository {
             category = "Sweet Treats",
             imageResId = R.drawable.product_cookie,
             calories = 220,
+            isCustomisable = false,
             sizeOptions = listOf("Single"),
             milkOptions = listOf("Not applicable"),
             shotOptions = listOf("Not applicable"),
@@ -97,6 +98,7 @@ class MenuRepository {
             category = "Sweet Treats",
             imageResId = R.drawable.product_cookie,
             calories = 310,
+            isCustomisable = false,
             sizeOptions = listOf("Single"),
             milkOptions = listOf("Not applicable"),
             shotOptions = listOf("Not applicable"),
@@ -114,6 +116,7 @@ class MenuRepository {
             customisationOptions = listOf("Standard", "Toasted", "No butter"),
             imageResId = R.drawable.product_banana_bread,
             calories = 280,
+            isCustomisable = false,
             sizeOptions = listOf("Single slice"),
             milkOptions = listOf("Not applicable"),
             shotOptions = listOf("Not applicable"),
@@ -136,7 +139,7 @@ class MenuRepository {
             temperatureOptions = listOf("Chilled", "Toasted"),
             sweetnessOptions = listOf("Standard"),
             syrupOptions = listOf("No syrup"),
-            toppingOptions = listOf("Standard filling", "No tomato"),
+            toppingOptions = listOf("Standard filling", "Extra cheese", "No tomato"),
         ),
         MenuItem(
             id = "cheese-toastie",
@@ -152,7 +155,7 @@ class MenuRepository {
             temperatureOptions = listOf("Toasted"),
             sweetnessOptions = listOf("Standard"),
             syrupOptions = listOf("No syrup"),
-            toppingOptions = listOf("Standard filling"),
+            toppingOptions = listOf("Standard filling", "Extra cheese"),
         ),
     )
 }

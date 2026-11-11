@@ -9,6 +9,7 @@ data class MenuItem(
     val category: String = "Other",
     val customisationOptions: List<String> = listOf("Standard"),
     val imageResId: Int = 0,
+    val isCustomisable: Boolean = true,
     val calories: Int = 0,
     val nutritionNote: String = "AI-generated estimate for prototype use — not verified",
     val sizeOptions: List<String> = listOf("Regular", "Large"),

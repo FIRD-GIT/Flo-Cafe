@@ -52,6 +52,17 @@ Each feature entry should explain:
 
 Add dated entries below as implementation begins. Do not mark a feature complete until the code location, visible behaviour, and validation evidence are recorded.
 
+## 2026-11-11 — Pricing consistency and conditional customisation
+
+- **Status:** Implemented and build-verified.
+- **Requirement links:** PRD FR-03, FR-05, FR-06, FR-18; CAFE-04, CAFE-06, CAFE-21.
+- **Purpose and user value:** make price presentation consistent and prevent customers from being sent through an unnecessary customisation flow for fixed products.
+- **Decision and rationale:** a shared formatter now displays fractional prices with exactly two decimal places (`£3.20`, `£2.60`) while whole-pound amounts display without redundant decimals (`£3`). Menu items explicitly declare whether meaningful customisation exists. Fixed sweet treats add directly to the basket; drinks and sandwiches retain the customisation form.
+- **Code location:** `PriceFormatter.kt`, `MenuItem.kt`, `MenuRepository.kt`, `CustomerActivity.kt`, and `PriceFormatterTest.kt`.
+- **Code-to-screen translation:** product cards use the shared formatter and conditionally show `Add to basket` or `Customise`. Sandwich options include `Extra cheese` and `No tomato`.
+- **Validation:** pricing and menu customisation unit tests pass; the Firebase-enabled debug build succeeds and the emulator displays prices such as `£3.20` and `£2.60`.
+- **Known limitations:** menu pricing remains local coursework data and is not yet remotely managed.
+
 ## 2026-11-11 — Customer tab redesign and expanded catalogue
 
 - **Status:** Implemented and build-verified; live authenticated visual evidence remains to be captured.
