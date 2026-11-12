@@ -644,8 +644,7 @@ class CustomerActivity : AppCompatActivity() {
             cornerRadius = dp(radius).toFloat()
         }
 
-    private fun basketTotal(): Double =
-        basket.sumOf { it.item.price * it.quantity }
+    private fun basketTotal(): Double = BasketCalculator.total(basket)
 
     private fun orderProgress(status: String): String = when (status) {
         "Pending" -> "1/4"

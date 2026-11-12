@@ -44,8 +44,8 @@ class UserRepository(
     }
 
     suspend fun signIn(email: String, password: String): UserRole {
-        require(email.isNotBlank()) { "Email is required." }
-        require(password.isNotBlank()) { "Password is required." }
+        InputValidation.requireEmail(email)
+        InputValidation.requireLoginPassword(password)
         check(isFirebaseConfigured) { "Firebase is not configured for this build." }
         auth.signInWithEmailAndPassword(email.trim(), password).await()
         return currentUserRole() ?: UserRole.CUSTOMER
@@ -56,8 +56,8 @@ class UserRepository(
         password: String,
         displayName: String,
     ): UserRole {
-        require(email.isNotBlank()) { "Email is required." }
-        require(password.length >= 6) { "Password must contain at least 6 characters." }
+        InputValidation.requireEmail(email)
+        InputValidation.requireRegistrationPassword(password)
         check(isFirebaseConfigured) { "Firebase is not configured for this build." }
         val result = auth.createUserWithEmailAndPassword(email.trim(), password).await()
         val firebaseUser = requireNotNull(result.user) { "Firebase did not return the new user." }

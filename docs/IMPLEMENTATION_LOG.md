@@ -143,6 +143,16 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Validation:** `./gradlew :app:assembleDebug :app:testDebugUnitTest --no-daemon` passed; `git diff --check` passed; the APK installed successfully on `emulator-5554`.
 - **Commit references:** `d766c46` (`Improve basket spacing and controls`) and `3c4f2b1` (`Space order history cards`).
 
+## 2026-11-12 — Testing evidence and manual test plan
+
+- **Status:** Automated coverage expanded; Firebase end-to-end evidence remains to be captured.
+- **Requirement links:** PRD NFR-01, NFR-05, NFR-08; CAFE-13, CAFE-18.
+- **Purpose and user value:** make the testing position explicit and provide repeatable evidence for validation, calculations, navigation, persistence and failure handling.
+- **Decision and rationale:** extract pure authentication validation and basket-total calculations so they can be tested without Firebase or Android UI dependencies. Keep emulator and live Firebase scenarios in a separate manual test plan because they require device state, configured services and synthetic accounts.
+- **Code location:** `InputValidation.kt`, `BasketCalculatorTest.kt`, `InputValidationTest.kt`, existing menu/price/fingerprint tests, and `docs/testing/MANUAL_TEST_PLAN.md`.
+- **Validation:** `assembleDebug` and `testDebugUnitTest` pass; the generated HTML report is under `app/build/reports/tests/testDebugUnitTest/`.
+- **Known limitations:** repository persistence, role restrictions, duplicate protection and network failure paths still need captured live Firebase test evidence.
+
 ## 2026-11-04 — Firebase user-role foundation
 
 - **Status:** Foundation implemented; Firebase project configuration and emulator verification remain pending.
