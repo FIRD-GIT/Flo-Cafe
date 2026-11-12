@@ -153,6 +153,15 @@ Add dated entries below as implementation begins. Do not mark a feature complete
 - **Validation:** `assembleDebug` and `testDebugUnitTest` pass; the generated HTML report is under `app/build/reports/tests/testDebugUnitTest/`.
 - **Known limitations:** repository persistence, role restrictions, duplicate protection and network failure paths still need captured live Firebase test evidence.
 
+## 2026-11-12 — PRD testing traceability
+
+- **Status:** Documentation aligned with supplied PRD guidance.
+- **Requirement links:** PRD NFR-08, NFR-09; CAFE-13, CAFE-18.
+- **Purpose and user value:** make it possible for a marker to follow each important requirement from the backlog to source code, automated/manual test coverage and remaining evidence.
+- **Source used:** supplied `Flo-Cafe-PRD-Explanation.pdf`, plus the repository PRD and backlog.
+- **Evidence:** `docs/testing/TRACEABILITY_MATRIX.md` maps automated and manual cases, reports the current results honestly, and lists the remaining Firebase evidence.
+- **Known limitation:** no separate marking-rubric document was present in the supplied folders; the matrix therefore does not invent rubric criteria or claim live Firebase scenarios that have not been executed.
+
 ## 2026-11-04 — Firebase user-role foundation
 
 - **Status:** Foundation implemented; Firebase project configuration and emulator verification remain pending.

@@ -1,7 +1,9 @@
 # Flo Cafe manual test plan
 
 This plan records emulator and Firebase checks that complement the JVM unit
-tests. Test data must be synthetic and no credentials should be committed.
+tests. It follows the supplied `Flo-Cafe-PRD-Explanation.pdf` guidance that
+requirements must be connected to tests and visible evidence. Test data must be
+synthetic and no credentials should be committed.
 
 ## Environment
 
@@ -32,3 +34,5 @@ tests. Test data must be synthetic and no credentials should be committed.
 
 The HTML report is generated at
 `app/build/reports/tests/testDebugUnitTest/index.html`.
+
+See `docs/testing/TRACEABILITY_MATRIX.md` for the requirement-to-test mapping.
