@@ -51,6 +51,12 @@ class UserRepository(
         return currentUserRole() ?: UserRole.CUSTOMER
     }
 
+    suspend fun sendPasswordReset(email: String) {
+        InputValidation.requireEmail(email)
+        check(isFirebaseConfigured) { "Firebase is not configured for this build." }
+        auth.sendPasswordResetEmail(email.trim()).await()
+    }
+
     suspend fun registerCustomer(
         email: String,
         password: String,
@@ -76,6 +82,16 @@ class UserRepository(
         require(profile.uid.isNotBlank()) { "A user profile requires a Firebase UID." }
         check(isFirebaseConfigured) { "Firebase is not configured for this build." }
         firestore.collection("users").document(profile.uid).set(profile).await()
+    }
+
+    suspend fun updateDisplayName(displayName: String) {
+        val uid = requireNotNull(currentUserId) { "Sign in before updating your profile." }
+        val trimmedName = displayName.trim()
+        require(trimmedName.isNotBlank()) { "Display name is required." }
+        check(isFirebaseConfigured) { "Firebase is not configured for this build." }
+        firestore.collection("users").document(uid)
+            .update("displayName", trimmedName)
+            .await()
     }
 
     fun signOut() {

@@ -28,6 +28,21 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    match /feedback/{feedbackId} {
+      allow create: if request.auth != null
+        && request.resource.data.customerUid == request.auth.uid
+        && get(/databases/$(database)/documents/orders/$(request.resource.data.orderId)).data.customerUid == request.auth.uid
+        && get(/databases/$(database)/documents/orders/$(request.resource.data.orderId)).data.status == "Collected"
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() > 0;
+      allow read: if isAdmin()
+        || (request.auth != null && resource.data.customerUid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
     function isAdmin() {
       return request.auth != null
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;

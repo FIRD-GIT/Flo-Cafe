@@ -73,3 +73,18 @@ Future entries should include:
 
 - Commits: `a877530`, `106c99a`, `e7ce939`, `55b8afd`, `518bb4b`, `d766c46`, `3c4f2b1`.
 - Validation: Firebase-enabled debug build and unit tests pass; the APK installs on `emulator-5554`.
+
+## 2026-11-15
+
+- Added Firestore snapshot listeners for customer orders so status changes update the Home/Profile views without a manual refresh.
+- Added persisted customer display-name editing through the existing user profile document and kept the demo mode local.
+- Added a Home coffee-cup progress banner tied to Pending, Preparing, Ready for Collection and Collected states.
+- Added stage-specific local Android notifications with an in-app status fallback. This does not claim external push delivery; Android notification permission and a foreground/listener session are still required.
+- Added a transparent, editable AI drink-builder prototype that does not call an AI provider or claim product availability; supported drink choices remain controlled by the existing customiser.
+- Added customer review submission for collected orders and an authorised-admin review view protected by Firestore rules.
+- Redesigned the login surface with the supplied Flo Cafe branding asset, gradient background, rounded inputs, sign-in/register toggle and password-reset action.
+- Added `flo_cafe_branding.png` from the supplied attachment. The asset is used as the login/header branding without inventing a replacement logo.
+- Replaced the login header with the supplied horizontal logo resource and added a native Android backplate/shadow treatment because XML layouts do not support CSS `filter: drop-shadow(...)`.
+- Registered the supplied app icon for the Android application, round icon and Android 12+ splash icon.
+- Added envelope and padlock input icons, an outlined local-demo button, and a dedicated light-red Firebase configuration warning box.
+- Replaced the earlier logo resources with the latest transparent PNG attachments, removed the logo backplate, and added a native layered shadow treatment. Added the person icon for registration, made Register a secondary outlined submit action, and removed the redundant signed-out sentence.

@@ -12,16 +12,19 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var roleText: TextView
     private lateinit var statusText: TextView
+    private lateinit var firebaseWarningText: TextView
     private lateinit var emailInput: EditText
     private lateinit var passwordInput: EditText
     private lateinit var displayNameInput: EditText
     private lateinit var userRepository: UserRepository
+    private var registerMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         roleText = findViewById(R.id.roleText)
         statusText = findViewById(R.id.statusText)
+        firebaseWarningText = findViewById(R.id.firebaseWarningText)
         emailInput = findViewById(R.id.emailInput)
         passwordInput = findViewById(R.id.passwordInput)
         displayNameInput = findViewById(R.id.displayNameInput)
@@ -29,7 +32,8 @@ class MainActivity : AppCompatActivity() {
 
         if (!userRepository.isFirebaseConfigured) {
             roleText.text = getString(R.string.firebase_configuration_required)
-            statusText.text = getString(R.string.firebase_setup_hint)
+            firebaseWarningText.text = getString(R.string.firebase_setup_hint)
+            firebaseWarningText.visibility = android.view.View.VISIBLE
             setAuthenticationEnabled(false)
             findViewById<Button>(R.id.demoMenuButton).apply {
                 visibility = android.view.View.VISIBLE
@@ -42,19 +46,35 @@ class MainActivity : AppCompatActivity() {
             }
             return
         }
+        firebaseWarningText.visibility = android.view.View.GONE
 
-        findViewById<Button>(R.id.signInButton).setOnClickListener {
+        val primaryButton = findViewById<Button>(R.id.primaryAuthButton)
+        findViewById<Button>(R.id.signInToggle).setOnClickListener {
+            registerMode = false
+            updateAuthMode(primaryButton)
+        }
+        findViewById<Button>(R.id.registerToggle).setOnClickListener {
+            registerMode = true
+            updateAuthMode(primaryButton)
+        }
+        primaryButton.setOnClickListener {
             authenticate {
-                userRepository.signIn(emailInput.text.toString(), passwordInput.text.toString())
+                if (registerMode) {
+                    userRepository.registerCustomer(
+                        emailInput.text.toString(),
+                        passwordInput.text.toString(),
+                        displayNameInput.text.toString(),
+                    )
+                } else {
+                    userRepository.signIn(emailInput.text.toString(), passwordInput.text.toString())
+                }
             }
         }
-        findViewById<Button>(R.id.registerButton).setOnClickListener {
-            authenticate {
-                userRepository.registerCustomer(
-                    emailInput.text.toString(),
-                    passwordInput.text.toString(),
-                    displayNameInput.text.toString(),
-                )
+        findViewById<TextView>(R.id.forgotPasswordButton).setOnClickListener {
+            lifecycleScope.launch {
+                runCatching { userRepository.sendPasswordReset(emailInput.text.toString()) }
+                    .onSuccess { statusText.text = getString(R.string.password_reset_sent) }
+                    .onFailure { error -> statusText.text = error.message ?: getString(R.string.authentication_failed) }
             }
         }
 
@@ -81,7 +101,7 @@ class MainActivity : AppCompatActivity() {
             UserRole.CUSTOMER -> openRoleActivity(CustomerActivity::class.java)
             null -> {
                 roleText.text = getString(R.string.authentication_required)
-                statusText.text = getString(R.string.signed_out_message)
+                statusText.text = getString(R.string.welcome_message)
             }
         }
     }
@@ -95,7 +115,19 @@ class MainActivity : AppCompatActivity() {
         emailInput.isEnabled = enabled
         passwordInput.isEnabled = enabled
         displayNameInput.isEnabled = enabled
-        findViewById<Button>(R.id.signInButton).isEnabled = enabled
-        findViewById<Button>(R.id.registerButton).isEnabled = enabled
+        findViewById<Button>(R.id.primaryAuthButton).isEnabled = enabled
+        findViewById<Button>(R.id.signInToggle).isEnabled = enabled
+        findViewById<Button>(R.id.registerToggle).isEnabled = enabled
+    }
+
+    private fun updateAuthMode(primaryButton: Button) {
+        displayNameInput.visibility = if (registerMode) android.view.View.VISIBLE else android.view.View.GONE
+        primaryButton.text = getString(if (registerMode) R.string.register else R.string.sign_in)
+        primaryButton.background = getDrawable(
+            if (registerMode) R.drawable.auth_outline_button else R.drawable.auth_primary_button,
+        )
+        primaryButton.setTextColor(
+            getColor(if (registerMode) R.color.auth_purple else android.R.color.white),
+        )
     }
 }

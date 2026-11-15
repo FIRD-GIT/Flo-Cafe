@@ -14,6 +14,7 @@ class AdminActivity : AppCompatActivity() {
     private lateinit var statusText: TextView
     private lateinit var ordersText: TextView
     private lateinit var orderActions: LinearLayout
+    private lateinit var reviewsText: TextView
     private lateinit var userRepository: UserRepository
     private lateinit var orderRepository: OrderRepository
 
@@ -23,11 +24,39 @@ class AdminActivity : AppCompatActivity() {
         statusText = findViewById(R.id.adminStatusText)
         ordersText = findViewById(R.id.adminOrdersText)
         orderActions = findViewById(R.id.orderActions)
+        reviewsText = findViewById(R.id.adminReviewsText)
         userRepository = UserRepository(this)
         orderRepository = OrderRepository(userRepository)
 
         findViewById<Button>(R.id.logoutButton).setOnClickListener { signOut() }
         showAdminOrders()
+        showReviews()
+    }
+
+    private fun showReviews() {
+        lifecycleScope.launch {
+            runCatching { FeedbackRepository(userRepository).allForAdmin() }
+                .onSuccess { reviews ->
+                    reviewsText.text = if (reviews.isEmpty()) {
+                        getString(R.string.no_reviews)
+                    } else {
+                        getString(
+                            R.string.admin_reviews,
+                            reviews.joinToString("\n\n") {
+                                getString(
+                                    R.string.review_summary,
+                                    it.rating,
+                                    it.orderId.takeLast(6).uppercase(),
+                                    it.comment,
+                                )
+                            },
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    reviewsText.text = error.message ?: getString(R.string.reviews_failed)
+                }
+        }
     }
 
     private fun showAdminOrders() {
