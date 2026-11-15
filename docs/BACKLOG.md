@@ -14,9 +14,9 @@ Priorities follow the coursework lab convention: **Must**, **Should**, **Could**
 | CAFE-07 | As a customer, I want to submit my basket as an order so that the café can prepare it. | Empty baskets cannot be submitted; a successful submission creates one order and shows a reference; failures do not show false success; recent matching orders trigger confirmation. | Must | Firdaos | Done |
 | CAFE-08 | As a customer, I want to see my current order status so that I know when to collect it. | Pending, Preparing, Ready for Collection, and Collected are represented clearly with progress and a ready notification. | Must | Firdaos | Done |
 | CAFE-09 | As a customer, I want to view previous orders so that I can review what I purchased. | Completed orders are listed with date, items, total, and status. | Should | Firdaos | Done |
-| CAFE-10 | As a customer, I want to rate a completed order so that I can provide feedback. | Only eligible orders can be rated; rating range and comment validation work; confirmation is shown. | Should | Firdaos | To do |
+| CAFE-10 | As a customer, I want to rate a completed order so that I can provide feedback. | Only eligible orders can be rated; rating range and comment validation work; confirmation is shown. | Should | Firdaos | Done |
 | CAFE-11 | As a customer, I want status changes highlighted so that I notice when my order is ready. | A refreshed or simulated status change is visible without requiring a misleading success state. | Should | Firdaos | Done |
-| CAFE-12 | As a customer, I want a useful advanced feature so that the app provides more than basic CRUD. | Selected integration has a defined user value, failure fallback, test case, and documentation. | Must | Firdaos | To do |
+| CAFE-12 | As a customer, I want a useful advanced feature so that the app provides more than basic CRUD. | Selected integration has a defined user value, failure fallback, test case, and documentation. | Must | Firdaos | Done |
 | CAFE-13 | As a developer, I want core validation and repository tests so that regressions are detected. | Test cases cover authentication validation, totals, order persistence, and failure paths. | Must | Firdaos | In progress |
 | CAFE-14 | As a stakeholder, I want changes recorded so that decisions remain traceable. | Meaningful changes appear in the changelog and are linked to backlog/meeting evidence. | Must | Firdaos | Done |
 | CAFE-15 | As a sub-admin, I want to view incoming orders and update controlled statuses so that customers see accurate preparation progress. | Only a permitted sub-admin can access the workflow; status updates are validated, persisted, and visible to the customer. | Must | Firdaos | Done |
@@ -28,6 +28,8 @@ Priorities follow the coursework lab convention: **Must**, **Should**, **Could**
 | CAFE-21 | As a customer, I want to customise coffee like a major coffee-chain app so that my order matches my preferences. | Product detail supports relevant size, milk, shots, temperature, sweetness, syrups, toppings, and whipped cream choices; fixed treats add directly; the basket stores a concise summary. | Must | Firdaos | Done |
 | CAFE-22 | As a customer, I want nutrition information so that I can make an informed choice. | Each item shows a clearly labelled AI-generated, unverified prototype estimate until verified data is supplied. | Should | Firdaos | Done |
 | CAFE-23 | As a customer, I want my home screen personalised so that it feels like my account. | Home displays `Welcome, {display name}`, featured products, shortcuts, favourites and order status. | Should | Firdaos | Done |
+| CAFE-24 | As a customer, I want profile-name edits to persist so that my greeting remains consistent across devices. | A saved display name updates the authenticated Firestore user profile and is reloaded on the next session. | Should | Firdaos | Done |
+| CAFE-25 | As an authorised admin, I want to see customer reviews so that feedback informs café decisions. | Reviews are stored under customer ownership and visible only to authorised admins or the submitting customer. | Should | Firdaos | Done |
 
 ## Definition of done
 

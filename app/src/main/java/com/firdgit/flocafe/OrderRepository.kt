@@ -2,6 +2,7 @@ package com.firdgit.flocafe
 
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 
 class OrderRepository(
@@ -89,6 +90,26 @@ class OrderRepository(
         check(userRepository.isFirebaseConfigured) { "Firebase is not configured for this build." }
         firestore.collection("orders").document(orderId).update("status", status).await()
     }
+
+    fun observeCustomerOrders(
+        onUpdate: (List<OrderSummary>) -> Unit,
+        onError: (Exception) -> Unit,
+    ): ListenerRegistration? {
+        if (!isConfiguredForCurrentCustomer()) return null
+        val customerUid = userRepository.currentUserId ?: return null
+        return firestore.collection("orders")
+            .whereEqualTo("customerUid", customerUid)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+                onUpdate(snapshot?.documents.orEmpty().map(::toOrderSummary))
+            }
+    }
+
+    private fun isConfiguredForCurrentCustomer(): Boolean =
+        userRepository.isFirebaseConfigured && userRepository.currentUserId != null
 
     private suspend fun customerOrders(): List<OrderSummary> {
         val customerUid = requireNotNull(userRepository.currentUserId) {

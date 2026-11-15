@@ -52,6 +52,32 @@ Each feature entry should explain:
 
 Add dated entries below as implementation begins. Do not mark a feature complete until the code location, visible behaviour, and validation evidence are recorded.
 
+## 2026-11-15 — Supplied logo integration and authentication polish
+
+- **Status:** Implemented and build-verified.
+- **Requirement links:** PRD NFR-01, NFR-02, NFR-08; customer login and branding acceptance criteria.
+- **Purpose and user value:** make the authentication surface use the supplied brand assets consistently and improve field affordance, error hierarchy and button emphasis.
+- **Decision and rationale:** `horizontal_logo.png` is used above the Flo Cafe title, while `app_icon.png` is registered as the application/round icon and Android 12+ splash icon. Android XML has no CSS `filter: drop-shadow`; a subtle rounded translucent backplate provides the equivalent contrast treatment without inventing a logo.
+- **Code location:** `activity_main.xml`, `MainActivity.kt`, `AndroidManifest.xml`, `values-v31/themes.xml`, `auth_logo_backplate.xml`, `auth_warning_background.xml`, `auth_outline_button.xml`, `ic_email.xml`, `ic_lock.xml`, and the supplied resources under `drawable-nodpi`.
+- **Validation:** debug APK build and emulator installation are required after this change; live Firebase configuration remains separate from the visual login validation.
+- **Known limitations:** the supplied message attachments are JPEG transcodes of the named PNG assets, so the repository stores converted PNG resources with the visible checkerboard pixels preserved from the supplied files; no unsupported transparency cleanup was invented.
+
+### Follow-up asset revision
+
+The later supplied PNG attachments are now used directly as `horizontal_logo.png` and `app_icon.png`. The login header has no background or border; its shadow is a subtle tinted duplicate image layer, which is the closest native XML equivalent to CSS `drop-shadow`. The login form now includes person, envelope and padlock icons, a solid Sign In CTA, outlined Register and demo actions, and no redundant signed-out status sentence.
+
+## 2026-11-15 — Stakeholder improvements: live status, profiles, feedback and honest prototypes
+
+- **Status:** Implemented and build-verified; live Firebase/security and Android permission evidence remains environment-dependent.
+- **Requirement links:** PRD FR-08, FR-10, FR-11, FR-12, FR-15, FR-16, NFR-03, NFR-05; CAFE-10, CAFE-11, CAFE-12, CAFE-17, CAFE-24, CAFE-25.
+- **Purpose and user value:** reduce refresh friction, keep profile identity consistent, make order progress visible from Home, provide a truthful advanced-feature prototype, and expose customer feedback to the authorised operational role.
+- **Decision and rationale:** use Firestore `addSnapshotListener` for the existing customer order query rather than polling; update the existing `users/{uid}` document rather than creating duplicate profile data; use local Android notifications plus an in-app message rather than claiming FCM push delivery; keep the AI builder as editable suggestion text because no provider or menu-availability service is configured.
+- **Code location:** `OrderRepository.kt`, `UserRepository.kt`, `FeedbackRepository.kt`, `CustomerActivity.kt`, `AdminActivity.kt`, `firestore.rules`, `activity_main.xml`, `auth_gradient.xml`, `auth_input_background.xml`, `flo_cafe_branding.png`, `strings.xml`, and `AndroidManifest.xml`.
+- **Code-to-screen translation:** customer order snapshots rebuild Home/Profile state and show the coffee cup/progress banner; status transitions update the in-app message and attempt a local Android notification. Collected orders expose a review dialog, while Admin displays feedback from the protected `feedback` collection. Login uses the supplied combined branding asset, rounded fields and a display-name-only registration mode.
+- **Validation:** `ANDROID_HOME="$HOME/Library/Android/sdk" ./gradlew testDebugUnitTest assembleDebug --no-daemon --console=plain` passed. The initial validation without an SDK path was blocked by the missing `ANDROID_HOME`, not by source errors.
+- **Known limitations:** external push delivery is not configured; Android 13+ notification permission may suppress the local notification, with the in-app status remaining available. The AI builder is a transparent non-provider prototype and does not guarantee menu availability. Live Firestore rules, review reads and listener transitions require a configured Firebase project and synthetic accounts. Basket cup colour is represented through the selected customisation summary and product image; no remote product-image recolouring is claimed.
+- **Commit reference:** to be added after the feature commit.
+
 ## 2026-11-11 — Spaced categories and product-specific customisation
 
 - **Status:** Implemented and build-verified.

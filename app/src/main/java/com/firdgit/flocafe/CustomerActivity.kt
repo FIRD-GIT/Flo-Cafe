@@ -1,7 +1,10 @@
 package com.firdgit.flocafe
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
@@ -18,6 +21,9 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.google.firebase.firestore.ListenerRegistration
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -33,6 +39,7 @@ class CustomerActivity : AppCompatActivity() {
     private lateinit var statusText: TextView
     private lateinit var userRepository: UserRepository
     private lateinit var orderRepository: OrderRepository
+    private lateinit var feedbackRepository: FeedbackRepository
     private val basket = mutableListOf<BasketLine>()
     private val favourites = mutableSetOf<String>()
     private var orders = emptyList<OrderRepository.OrderSummary>()
@@ -40,6 +47,8 @@ class CustomerActivity : AppCompatActivity() {
     private var selectedTab = Tab.HOME
     private var selectedMenuCategory: String? = null
     private var isSubmitting = false
+    private var orderListener: ListenerRegistration? = null
+    private val lastKnownStatuses = mutableMapOf<String, String>()
     private val isDemoMode by lazy { intent.getBooleanExtra(EXTRA_DEMO_MODE, false) }
 
     private enum class Tab { HOME, MENU, BASKET, PROFILE }
@@ -51,6 +60,7 @@ class CustomerActivity : AppCompatActivity() {
         statusText = findViewById(R.id.customerStatusText)
         userRepository = UserRepository(this)
         orderRepository = OrderRepository(userRepository)
+        feedbackRepository = FeedbackRepository(userRepository)
 
         findViewById<Button>(R.id.homeTabButton).setOnClickListener { showTab(Tab.HOME) }
         findViewById<Button>(R.id.menuTabButton).setOnClickListener { showTab(Tab.MENU) }
@@ -64,6 +74,7 @@ class CustomerActivity : AppCompatActivity() {
             loadCustomerDetails()
         }
         showTab(Tab.HOME)
+        observeOrders()
     }
 
     private fun loadCustomerDetails() {
@@ -86,6 +97,24 @@ class CustomerActivity : AppCompatActivity() {
             }
             if (selectedTab == Tab.HOME || selectedTab == Tab.PROFILE) showTab(selectedTab)
         }
+    }
+
+    private fun observeOrders() {
+        if (isDemoMode) return
+        orderListener = orderRepository.observeCustomerOrders(
+            onUpdate = { updatedOrders ->
+                val changedReadyOrder = updatedOrders.firstOrNull { order ->
+                    order.status == "Ready for Collection" &&
+                        lastKnownStatuses[order.id] != null &&
+                        lastKnownStatuses[order.id] != order.status
+                }
+                orders = updatedOrders.sortedByDescending { it.createdAtMillis ?: 0L }
+                updatedOrders.forEach { lastKnownStatuses[it.id] = it.status }
+                changedReadyOrder?.let { showStageNotification(it) }
+                if (selectedTab == Tab.HOME || selectedTab == Tab.PROFILE) showTab(selectedTab)
+            },
+            onError = { statusText.text = getString(R.string.orders_failed) },
+        )
     }
 
     private fun showTab(tab: Tab) {
@@ -118,6 +147,11 @@ class CustomerActivity : AppCompatActivity() {
     private fun homeView(): View = verticalScroll {
         addView(title(getString(R.string.home_greeting, displayName), 28f))
         addView(body(getString(R.string.home_subtitle)))
+        orders.firstOrNull { it.status != "Collected" }?.let { addView(orderProgressBanner(it)) }
+        addView(
+            secondaryButton(getString(R.string.ai_builder_button)) { showAiBuilderPrototype() },
+            spacedParams(top = 8, bottom = 4),
+        )
         addView(sectionTitle(getString(R.string.featured_heading)))
         MenuRepository().availableItems().take(3).forEach { addView(productCard(it, compact = true)) }
         addView(sectionTitle(getString(R.string.categories_heading)))
@@ -137,6 +171,40 @@ class CustomerActivity : AppCompatActivity() {
             actionButton(getString(R.string.view_basket)) { showTab(Tab.BASKET) },
             spacedParams(top = 5, bottom = 6),
         )
+    }
+
+    private fun orderProgressBanner(order: OrderRepository.OrderSummary): View {
+        val progress = when (order.status) {
+            "Pending" -> 25
+            "Preparing" -> 50
+            "Ready for Collection", "Collected" -> 100
+            else -> 0
+        }
+        val accent = if (order.status == "Ready for Collection") "#D77A2B" else "#6A35C9"
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(12), dp(16), dp(14))
+            background = roundedBackground("#F0E9FF", 20)
+            addView(horizontalRow().apply {
+                addView(ImageView(this@CustomerActivity).apply {
+                    setImageResource(R.drawable.flo_cafe_cup)
+                    scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    setColorFilter(Color.parseColor(accent))
+                    contentDescription = getString(R.string.coffee_progress_description, order.status)
+                }, LinearLayout.LayoutParams(dp(54), dp(54)))
+                addView(LinearLayout(this@CustomerActivity).apply {
+                    orientation = LinearLayout.VERTICAL
+                    addView(title(getString(R.string.home_progress_title), 18f))
+                    addView(body(getString(R.string.home_progress_status, order.status)))
+                }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            })
+            addView(android.widget.ProgressBar(this@CustomerActivity, null, android.R.attr.progressBarStyleHorizontal).apply {
+                max = 100
+                this.progress = progress
+                progressTintList = android.content.res.ColorStateList.valueOf(Color.parseColor(accent))
+                contentDescription = getString(R.string.coffee_progress_description, order.status)
+            }, LinearLayout.LayoutParams.MATCH_PARENT, dp(8))
+        }.apply { layoutParams = spacedParams(top = 6, bottom = 8) }
     }
 
     private fun menuView(): View = verticalScroll {
@@ -298,6 +366,24 @@ class CustomerActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun showAiBuilderPrototype() {
+        val input = android.widget.EditText(this).apply {
+            hint = getString(R.string.ai_builder_hint)
+            setText(getString(R.string.ai_builder_suggestion))
+            minLines = 2
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.ai_builder_title)
+            .setMessage(R.string.ai_builder_disclosure)
+            .setView(input)
+            .setNegativeButton(R.string.cancel_order, null)
+            .setPositiveButton(R.string.ai_builder_apply) { _, _ ->
+                statusText.text = getString(R.string.ai_builder_saved, input.text.toString().trim())
+                showTab(Tab.MENU)
+            }
+            .show()
+    }
+
     private fun basketView(): View = verticalScroll {
         addView(title(getString(R.string.basket_heading), 28f))
         if (basket.isEmpty()) {
@@ -337,6 +423,12 @@ class CustomerActivity : AppCompatActivity() {
             elevation = dp(1).toFloat()
         }
         row.addView(ImageView(this).apply {
+            setImageResource(R.drawable.flo_cafe_cup)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            setColorFilter(Color.parseColor(customisationCupColor(line.customisation)))
+            contentDescription = getString(R.string.customisation_cup_description, line.customisation)
+        }, LinearLayout.LayoutParams(dp(42), dp(64)).apply { marginEnd = dp(4) })
+        row.addView(ImageView(this).apply {
             setImageResource(line.item.imageResId)
             contentDescription = getString(R.string.product_image_description, line.item.name)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
@@ -365,6 +457,17 @@ class CustomerActivity : AppCompatActivity() {
         row.addView(details, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         row.layoutParams = spacedParams(top = 7, bottom = 7)
         return row
+    }
+
+    private fun customisationCupColor(customisation: String): String {
+        val value = customisation.lowercase(Locale.UK)
+        return when {
+            "iced" in value || "cold" in value -> "#4A90C2"
+            "oat" in value || "almond" in value -> "#B9804A"
+            "vanilla" in value || "caramel" in value -> "#D49A52"
+            "chocolate" in value || "mocha" in value -> "#7B4B35"
+            else -> "#6A35C9"
+        }
     }
 
     private fun profileView(): View = verticalScroll {
@@ -457,10 +560,47 @@ class CustomerActivity : AppCompatActivity() {
         details.addView(sectionTitle(getString(R.string.order_detail_total_heading)))
         details.addView(title(PriceFormatter.format(order.total), 22f))
         details.addView(body(getString(R.string.order_detail_full_reference, order.id)))
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.order_detail_title, orderDisplayReference(order)))
             .setView(details)
             .setPositiveButton(R.string.close, null)
+        if (order.status == "Collected" && !isDemoMode) {
+            dialog.setNeutralButton(R.string.leave_review) { _, _ -> showReviewDialog(order) }
+        }
+        dialog.show()
+    }
+
+    private fun showReviewDialog(order: OrderRepository.OrderSummary) {
+        val form = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), 0, dp(20), 0)
+        }
+        val rating = Spinner(this).apply {
+            adapter = ArrayAdapter(this@CustomerActivity, android.R.layout.simple_spinner_item, listOf(1, 2, 3, 4, 5))
+        }
+        val comment = android.widget.EditText(this).apply {
+            hint = getString(R.string.review_comment_hint)
+            minLines = 3
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        }
+        form.addView(body(getString(R.string.review_rating_label)))
+        form.addView(rating)
+        form.addView(comment)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.leave_review)
+            .setView(form)
+            .setNegativeButton(R.string.cancel_order, null)
+            .setPositiveButton(R.string.submit_review) { _, _ ->
+                lifecycleScope.launch {
+                    runCatching {
+                        feedbackRepository.submit(order.id, rating.selectedItem as Int, comment.text.toString())
+                    }.onSuccess {
+                        statusText.text = getString(R.string.review_submitted)
+                    }.onFailure { error ->
+                        statusText.text = error.message ?: getString(R.string.review_failed)
+                    }
+                }
+            }
             .show()
     }
 
@@ -536,11 +676,54 @@ class CustomerActivity : AppCompatActivity() {
             .setView(input)
             .setNegativeButton(R.string.cancel_order, null)
             .setPositiveButton(R.string.save_profile) { _, _ ->
-                displayName = input.text.toString().trim().ifBlank { displayName }
-                statusText.text = getString(R.string.profile_saved)
-                showTab(Tab.PROFILE)
+                val updatedName = input.text.toString().trim()
+                lifecycleScope.launch {
+                    runCatching {
+                        if (!isDemoMode) userRepository.updateDisplayName(updatedName)
+                        displayName = updatedName
+                    }.onSuccess {
+                        statusText.text = getString(R.string.profile_saved)
+                        showTab(Tab.PROFILE)
+                    }.onFailure { error ->
+                        statusText.text = error.message ?: getString(R.string.profile_save_failed)
+                    }
+                }
             }
             .show()
+    }
+
+    private fun showStageNotification(order: OrderRepository.OrderSummary) {
+        val message = when (order.status) {
+            "Ready for Collection" -> getString(R.string.notification_ready)
+            "Preparing" -> getString(R.string.notification_preparing)
+            "Collected" -> getString(R.string.notification_collected)
+            else -> getString(R.string.notification_pending)
+        }
+        statusText.text = message
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "order_updates",
+                getString(R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            )
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+        }
+        runCatching {
+            NotificationManagerCompat.from(this).notify(
+                order.id.hashCode(),
+                NotificationCompat.Builder(this, "order_updates")
+                    .setSmallIcon(android.R.drawable.ic_dialog_info)
+                    .setContentTitle(getString(R.string.notification_title))
+                    .setContentText(message)
+                    .setAutoCancel(true)
+                    .build(),
+            )
+        }
+    }
+
+    override fun onDestroy() {
+        orderListener?.remove()
+        super.onDestroy()
     }
 
     private fun signOut() {
