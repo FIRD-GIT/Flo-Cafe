@@ -208,6 +208,16 @@ The later supplied PNG attachments are now used directly as `horizontal_logo.png
 - **Verification:** Main report prose was later revised to 1,100 words excluding section labels, references, appendices and the GenAI declaration, at the upper limit of the required 1,000 words ±10%. Implemented, proposed and simulated features are explicitly distinguished.
 - **Limitation:** Student number, final personal wording, source verification and genuine tutor feedback must be completed by the student before submission; the fictional privacy contact must not be used for deployment.
 
+## 2026-11-18 — Customer navigation and filling-cup UI refinement
+
+- **Status:** Implemented and build/emulator verified.
+- **Requirement links:** PRD FR-17, FR-22, NFR-01, NFR-02; CAFE-08, CAFE-16, CAFE-19.
+- **Purpose and user value:** replace the text-only bottom bar with clear icon navigation, remove the basket purple placeholder, make the profile edit action less dominant and show active order progress at 25/50/75/100 without tinting the whole supplied cup asset.
+- **Decision and rationale:** `BottomNavigationView` preserves the existing tab shell and selected state. The Home banner uses a standard Android horizontal `ProgressBar` with a custom layer-list track/fill beside the original cup asset. Basket cups no longer use `setColorFilter()`.
+- **Code location:** `activity_customer.xml`, `CustomerActivity.kt`, `OrderProgress.kt`, `cup_progress_bar.xml`, `cup_progress_track.xml`, `cup_progress_fill.xml`, `customer_bottom_navigation.xml`, customer navigation icons and `activity_admin.xml`.
+- **Validation:** the debug APK builds and 21 JVM tests pass. Emulator-5556 launched the updated app, completed customer login and showed the Pending state at 25%, icon bottom navigation and the supplied cup mark.
+- **Known limitations:** detailed 50/75/100 screenshots require live order-status transitions; accessibility labels and formal contrast checks remain to be captured.
+
 ## 2026-11-18 — Menu search, Firebase analytics and rule-based drink builder
 
 - **Status:** Implemented and unit/build verified; live Firebase analytics and admin-workflow screenshots remain to be captured.

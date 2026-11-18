@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -35,45 +36,16 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp" />
 
-    <LinearLayout
+    <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/customerBottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
         android:elevation="8dp"
-        android:orientation="horizontal"
-        android:padding="8dp">
-
-        <Button
-            android:id="@+id/homeTabButton"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_weight="1"
-            android:text="@string/tab_home"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/menuTabButton"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_weight="1"
-            android:text="@string/tab_menu"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/basketTabButton"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_weight="1"
-            android:text="@string/tab_basket"
-            android:textAllCaps="false" />
-
-        <Button
-            android:id="@+id/profileTabButton"
-            android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_weight="1"
-            android:text="@string/tab_profile"
-            android:textAllCaps="false" />
-    </LinearLayout>
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        app:menu="@menu/customer_bottom_navigation"
+        app:itemIconTint="@color/customer_nav_selector"
+        app:itemTextColor="@color/customer_nav_selector"
+        app:labelVisibilityMode="labeled" />
 </LinearLayout>

@@ -20,7 +20,7 @@ required LearningZone route.
 | Menu, orders and notifications/status | IP | Implemented customer menu, basket, order history and status display; live Firebase workflow evidence remains |
 | Feedback, if applicable | D/IP | Collected-order feedback is implemented and role-visible; live submission/admin evidence remains to capture |
 | Storage and SDK/API use | D | Firebase Auth and Firestore usage is documented in the code and data model |
-| Validation and testing | IP | 19 JVM tests pass; manual, Firebase, instrumented/UI and performance evidence remain partly outstanding |
+| Validation and testing | IP | 21 JVM tests pass; manual, Firebase, instrumented/UI and performance evidence remain partly outstanding |
 | Security and ethics | IP | Rules, ownership, role checks and GenAI declaration exist; final report must explain privacy, data protection and limitations |
 | Demo readiness | IP | Prepare a repeatable customer workflow, one rejected input/access attempt, stored data, code explanation and test evidence |
 

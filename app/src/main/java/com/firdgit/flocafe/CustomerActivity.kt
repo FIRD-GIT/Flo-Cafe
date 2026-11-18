@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -63,10 +64,15 @@ class CustomerActivity : AppCompatActivity() {
         orderRepository = OrderRepository(userRepository)
         feedbackRepository = FeedbackRepository(userRepository)
 
-        findViewById<Button>(R.id.homeTabButton).setOnClickListener { showTab(Tab.HOME) }
-        findViewById<Button>(R.id.menuTabButton).setOnClickListener { showTab(Tab.MENU) }
-        findViewById<Button>(R.id.basketTabButton).setOnClickListener { showTab(Tab.BASKET) }
-        findViewById<Button>(R.id.profileTabButton).setOnClickListener { showTab(Tab.PROFILE) }
+        findViewById<BottomNavigationView>(R.id.customerBottomNavigation).setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> showTab(Tab.HOME)
+                R.id.nav_menu -> showTab(Tab.MENU)
+                R.id.nav_basket -> showTab(Tab.BASKET)
+                R.id.nav_profile -> showTab(Tab.PROFILE)
+            }
+            true
+        }
 
         if (isDemoMode) {
             displayName = "Demo customer"
@@ -133,15 +139,22 @@ class CustomerActivity : AppCompatActivity() {
     }
 
     private fun updateNavigationButtons() {
-        val buttons = mapOf(
-            Tab.HOME to findViewById<Button>(R.id.homeTabButton),
-            Tab.MENU to findViewById<Button>(R.id.menuTabButton),
-            Tab.BASKET to findViewById<Button>(R.id.basketTabButton),
-            Tab.PROFILE to findViewById<Button>(R.id.profileTabButton),
-        )
-        buttons.forEach { (tab, button) ->
-            button.setTextColor(Color.parseColor(if (tab == selectedTab) "#6A35C9" else "#6B6673"))
-            button.setBackgroundColor(Color.parseColor(if (tab == selectedTab) "#F0E9FF" else "#FFFFFF"))
+        val navigation = findViewById<BottomNavigationView>(R.id.customerBottomNavigation)
+        navigation.setOnItemSelectedListener(null)
+        navigation.selectedItemId = when (selectedTab) {
+            Tab.HOME -> R.id.nav_home
+            Tab.MENU -> R.id.nav_menu
+            Tab.BASKET -> R.id.nav_basket
+            Tab.PROFILE -> R.id.nav_profile
+        }
+        navigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> showTab(Tab.HOME)
+                R.id.nav_menu -> showTab(Tab.MENU)
+                R.id.nav_basket -> showTab(Tab.BASKET)
+                R.id.nav_profile -> showTab(Tab.PROFILE)
+            }
+            true
         }
     }
 
@@ -175,13 +188,7 @@ class CustomerActivity : AppCompatActivity() {
     }
 
     private fun orderProgressBanner(order: OrderRepository.OrderSummary): View {
-        val progress = when (order.status) {
-            "Pending" -> 25
-            "Preparing" -> 50
-            "Ready for Collection", "Collected" -> 100
-            else -> 0
-        }
-        val accent = if (order.status == "Ready for Collection") "#D77A2B" else "#6A35C9"
+        val progress = OrderProgress.percent(order.status)
         return LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(12), dp(16), dp(14))
@@ -190,9 +197,8 @@ class CustomerActivity : AppCompatActivity() {
                 addView(ImageView(this@CustomerActivity).apply {
                     setImageResource(R.drawable.flo_cafe_cup)
                     scaleType = ImageView.ScaleType.CENTER_INSIDE
-                    setColorFilter(Color.parseColor(accent))
                     contentDescription = getString(R.string.coffee_progress_description, order.status)
-                }, LinearLayout.LayoutParams(dp(54), dp(54)))
+                }, LinearLayout.LayoutParams(dp(54), dp(54)).apply { marginEnd = dp(12) })
                 addView(LinearLayout(this@CustomerActivity).apply {
                     orientation = LinearLayout.VERTICAL
                     addView(title(getString(R.string.home_progress_title), 18f))
@@ -202,9 +208,9 @@ class CustomerActivity : AppCompatActivity() {
             addView(android.widget.ProgressBar(this@CustomerActivity, null, android.R.attr.progressBarStyleHorizontal).apply {
                 max = 100
                 this.progress = progress
-                progressTintList = android.content.res.ColorStateList.valueOf(Color.parseColor(accent))
+                progressDrawable = resources.getDrawable(R.drawable.cup_progress_bar, theme)
                 contentDescription = getString(R.string.coffee_progress_description, order.status)
-            }, LinearLayout.LayoutParams.MATCH_PARENT, dp(8))
+            }, LinearLayout.LayoutParams.MATCH_PARENT, dp(10))
         }.apply { layoutParams = spacedParams(top = 6, bottom = 8) }
     }
 
@@ -269,13 +275,20 @@ class CustomerActivity : AppCompatActivity() {
             useDefaultMargins = false
             setPadding(0, dp(4), 0, dp(10))
             categories.forEachIndexed { index, category ->
-                val button = actionButton(category) {
-                    selectedMenuCategory = category
-                    showTab(Tab.MENU)
+                val chip = com.google.android.material.chip.Chip(this@CustomerActivity).apply {
+                    text = category
+                    isCheckable = true
+                    isChecked = selectedMenuCategory == category
+                    chipMinHeight = dp(40).toFloat()
+                    setEnsureMinTouchTargetSize(true)
+                    setOnClickListener {
+                        selectedMenuCategory = category
+                        showTab(Tab.MENU)
+                    }
                 }
-                addView(button, GridLayout.LayoutParams().apply {
+                addView(chip, GridLayout.LayoutParams().apply {
                     width = 0
-                    height = dp(58)
+                    height = dp(48)
                     columnSpec = GridLayout.spec(index % 2, 1f)
                     rowSpec = GridLayout.spec(index / 2)
                     setMargins(dp(4), dp(4), dp(4), dp(4))
@@ -462,7 +475,6 @@ class CustomerActivity : AppCompatActivity() {
         row.addView(ImageView(this).apply {
             setImageResource(R.drawable.flo_cafe_cup)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
-            setColorFilter(Color.parseColor(customisationCupColor(line.customisation)))
             contentDescription = getString(R.string.customisation_cup_description, line.customisation)
         }, LinearLayout.LayoutParams(dp(42), dp(64)).apply { marginEnd = dp(4) })
         row.addView(ImageView(this).apply {
@@ -510,7 +522,14 @@ class CustomerActivity : AppCompatActivity() {
     private fun profileView(): View = verticalScroll {
         addView(title(getString(R.string.profile_heading), 28f))
         addView(body(getString(R.string.profile_email, userRepository.currentUserEmail ?: "Demo account")))
-        addView(actionButton(getString(R.string.edit_profile)) { editDisplayName() })
+        addView(
+            secondaryButton(getString(R.string.edit_profile)) { editDisplayName() },
+            LinearLayout.LayoutParams(dp(220), dp(44)).apply {
+                gravity = Gravity.START
+                topMargin = dp(4)
+                bottomMargin = dp(6)
+            },
+        )
         addView(sectionTitle(getString(R.string.profile_orders_heading)))
         if (orders.isEmpty()) addView(body(getString(R.string.no_orders)))
         else orders.forEach { addView(orderCard(it)) }

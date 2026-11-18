@@ -169,10 +169,10 @@ class AdminActivity : AppCompatActivity() {
     }
 
     private fun orderProgress(status: String): String = when (status) {
-        "Pending" -> "1/4"
-        "Preparing" -> "2/4"
-        "Ready for Collection" -> "3/4"
-        "Collected" -> "4/4"
-        else -> "0/4"
+        "Pending" -> "25%"
+        "Preparing" -> "50%"
+        "Ready for Collection" -> "75%"
+        "Collected" -> "100%"
+        else -> "0%"
     }
 }

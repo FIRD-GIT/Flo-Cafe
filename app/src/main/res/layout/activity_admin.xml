@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -24,6 +25,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        android:background="@drawable/auth_outline_button"
+        android:textColor="#6A35C9"
         android:text="@string/sign_out" />
 
     <ScrollView
@@ -43,20 +46,34 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/adminAnalyticsText"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/admin_analytics_loading" />
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true">
+
+                <TextView
+                    android:id="@+id/adminAnalyticsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="@string/admin_analytics_loading"
+                    android:textColor="#4A4550"
+                    android:textSize="15sp" />
+            </com.google.android.material.card.MaterialCardView>
 
             <EditText
                 android:id="@+id/adminOrderSearch"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="16dp"
+                android:background="@drawable/auth_input_background"
                 android:hint="@string/admin_order_search_hint"
-                android:inputType="text" />
+                android:inputType="text"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp" />
 
             <TextView
                 android:id="@+id/adminOrdersText"

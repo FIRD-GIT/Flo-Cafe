@@ -91,3 +91,5 @@ Future entries should include:
 - Added menu name/description/category search with a clear no-match state.
 - Added Firestore-backed sub-admin analytics for order count, sales, collected orders, average order value, average rating and top item.
 - Added a deterministic rule-based drink recommendation prototype with milk, flavour and sweetness choices. It is explicitly not a connected AI model.
+- Replaced the customer bottom bar with icon navigation, removed basket cup tinting, refined Profile edit action, converted category shortcuts to chips and card-wrapped sub-admin analytics.
+- Added a 25/50/75/100 active-order filling-cup progress presentation using the supplied cup mark and a custom Android progress drawable.
