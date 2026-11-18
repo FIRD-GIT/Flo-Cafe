@@ -218,6 +218,14 @@ The later supplied PNG attachments are now used directly as `horizontal_logo.png
 - **Validation:** the debug APK builds and 21 JVM tests pass. Emulator-5556 launched the updated app, completed customer login and showed the Pending state at 25%, icon bottom navigation and the supplied cup mark.
 - **Known limitations:** detailed 50/75/100 screenshots require live order-status transitions; accessibility labels and formal contrast checks remain to be captured.
 
+## 2026-11-18 — Basket, admin and drink-builder refinement
+
+- **Status:** Implemented and build/emulator verified.
+- **Purpose and user value:** remove the remaining purple basket placeholder, make sub-admin analytics and order actions easier to scan, and replace the outdated drink-builder dialog with a mobile-native bottom sheet.
+- **Code location:** `basketLineCard` in `CustomerActivity.kt`, `showAiBuilderPrototype()` in `CustomerActivity.kt`, `activity_admin.xml`, `AdminActivity.kt`, and `strings.xml`.
+- **Visible behavior:** Basket rows now show the product artwork without an extra colored cup block. Admin analytics appear in a two-column metric card and incoming orders appear in individual status cards with one next-action button. The drink builder opens as a bottom sheet with a live deterministic recommendation preview.
+- **Validation:** Debug build and 21 JVM tests pass. Emulator screenshots verify the Basket, Profile, Menu, sub-admin analytics and bottom-sheet builder surfaces.
+
 ## 2026-11-18 — Menu search, Firebase analytics and rule-based drink builder
 
 - **Status:** Implemented and unit/build verified; live Firebase analytics and admin-workflow screenshots remain to be captured.
@@ -225,7 +233,7 @@ The later supplied PNG attachments are now used directly as `horizontal_logo.png
 - **Purpose and user value:** make menu discovery faster, give authorised sub-admin users a direct operational dashboard, and provide a transparent second advanced-feature prototype.
 - **Decision and rationale:** menu search combines name, description and category filtering in pure repository logic. Firebase analytics is calculated from the existing Firestore order and feedback collections; it does not add unconfigured external services. The drink builder uses deterministic Kotlin rules with editable spinners and is explicitly described as non-AI.
 - **Code location:** `MenuRepository.kt`, `CustomerActivity.kt`, `AnalyticsCalculator.kt`, `DrinkRecommendation.kt`, `AdminActivity.kt`, `activity_admin.xml`, `strings.xml`, and the focused JVM test classes.
-- **Validation:** 19 JVM tests plus the debug build should pass after the final Gradle run. The admin should show live order count, sales, collected count, average order, average rating and top item from Firestore.
+- **Validation:** 21 JVM tests plus the debug build pass. The admin shows live order count, sales, collected count, average order, average rating and top item from Firestore.
 - **Known limitations:** external push delivery is not configured; Firebase analytics currently reads stored orders and reviews rather than server-maintained counters; live multi-account screenshots and offline/restart evidence remain assessment tasks.
 
 ## 2026-11-15 — Stakeholder feedback incorporated into ethics evidence

@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -401,7 +402,7 @@ class CustomerActivity : AppCompatActivity() {
     private fun showAiBuilderPrototype() {
         val form = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), 0, dp(20), 0)
+            setPadding(dp(24), dp(8), dp(24), dp(24))
         }
         val milk = Spinner(this)
         milk.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf("Semi-skimmed", "Oat", "Soya", "Almond"))
@@ -415,23 +416,50 @@ class CustomerActivity : AppCompatActivity() {
         form.addView(flavour)
         form.addView(body(getString(R.string.ai_builder_sweetness)))
         form.addView(sweetness)
-        AlertDialog.Builder(this)
-            .setTitle(R.string.ai_builder_title)
-            .setMessage(R.string.ai_builder_disclosure)
-            .setView(form)
-            .setNegativeButton(R.string.cancel_order, null)
-            .setPositiveButton(R.string.ai_builder_apply) { _, _ ->
-                val recommendation = DrinkRecommendation.recommend(
+        val recommendation = TextView(this).apply {
+            text = getString(R.string.ai_builder_result_placeholder)
+            textSize = 18f
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setTextColor(Color.parseColor("#24202B"))
+            setPadding(0, dp(16), 0, dp(8))
+        }
+        form.addView(recommendation)
+        val sheet = BottomSheetDialog(this)
+        fun updatePreview() {
+            recommendation.text = DrinkRecommendation.recommend(
+                DrinkRecommendation.Preferences(
+                    milk = milk.selectedItem?.toString().orEmpty(),
+                    flavour = flavour.selectedItem?.toString().orEmpty(),
+                    sweetness = sweetness.selectedItem?.toString().orEmpty(),
+                ),
+            )
+        }
+        val preferenceSelected = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) =
+                updatePreview()
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
+        }
+        milk.onItemSelectedListener = preferenceSelected
+        flavour.onItemSelectedListener = preferenceSelected
+        sweetness.onItemSelectedListener = preferenceSelected
+        updatePreview()
+        val applyButton = actionButton(getString(R.string.ai_builder_apply)) {
+                val recommendedDrink = DrinkRecommendation.recommend(
                     DrinkRecommendation.Preferences(
                         milk = milk.selectedItem.toString(),
                         flavour = flavour.selectedItem.toString(),
                         sweetness = sweetness.selectedItem.toString(),
                     ),
                 )
-                statusText.text = getString(R.string.ai_builder_saved, recommendation)
+                statusText.text = getString(R.string.ai_builder_saved, recommendedDrink)
+                sheet.dismiss()
                 showTab(Tab.MENU)
-            }
-            .show()
+        }
+        form.addView(applyButton, spacedParams(top = 10, bottom = 8))
+        form.addView(body(getString(R.string.ai_builder_disclosure)))
+
+        sheet.setContentView(form)
+        sheet.show()
     }
 
     private fun basketView(): View = verticalScroll {
@@ -473,11 +501,6 @@ class CustomerActivity : AppCompatActivity() {
             elevation = dp(1).toFloat()
         }
         row.addView(ImageView(this).apply {
-            setImageResource(R.drawable.flo_cafe_cup)
-            scaleType = ImageView.ScaleType.CENTER_INSIDE
-            contentDescription = getString(R.string.customisation_cup_description, line.customisation)
-        }, LinearLayout.LayoutParams(dp(42), dp(64)).apply { marginEnd = dp(4) })
-        row.addView(ImageView(this).apply {
             setImageResource(line.item.imageResId)
             contentDescription = getString(R.string.product_image_description, line.item.name)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
@@ -508,16 +531,6 @@ class CustomerActivity : AppCompatActivity() {
         return row
     }
 
-    private fun customisationCupColor(customisation: String): String {
-        val value = customisation.lowercase(Locale.UK)
-        return when {
-            "iced" in value || "cold" in value -> "#4A90C2"
-            "oat" in value || "almond" in value -> "#B9804A"
-            "vanilla" in value || "caramel" in value -> "#D49A52"
-            "chocolate" in value || "mocha" in value -> "#7B4B35"
-            else -> "#6A35C9"
-        }
-    }
 
     private fun profileView(): View = verticalScroll {
         addView(title(getString(R.string.profile_heading), 28f))

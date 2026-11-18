@@ -54,14 +54,55 @@
                 app:cardElevation="2dp"
                 app:cardUseCompatPadding="true">
 
-                <TextView
-                    android:id="@+id/adminAnalyticsText"
+                <GridLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:columnCount="2"
                     android:padding="16dp"
-                    android:text="@string/admin_analytics_loading"
-                    android:textColor="#4A4550"
-                    android:textSize="15sp" />
+                    android:useDefaultMargins="true">
+
+                    <TextView
+                        android:id="@+id/adminMetricOrders"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/admin_metric_orders_loading" />
+
+                    <TextView
+                        android:id="@+id/adminMetricSales"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/admin_metric_sales_loading" />
+
+                    <TextView
+                        android:id="@+id/adminMetricCollected"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/admin_metric_collected_loading" />
+
+                    <TextView
+                        android:id="@+id/adminMetricAverage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/admin_metric_average_loading" />
+
+                    <TextView
+                        android:id="@+id/adminMetricRating"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/admin_metric_rating_loading" />
+
+                    <TextView
+                        android:id="@+id/adminMetricTopItem"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/admin_metric_top_loading" />
+                </GridLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <EditText
