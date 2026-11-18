@@ -88,3 +88,6 @@ Future entries should include:
 - Registered the supplied app icon for the Android application, round icon and Android 12+ splash icon.
 - Added envelope and padlock input icons, an outlined local-demo button, and a dedicated light-red Firebase configuration warning box.
 - Replaced the earlier logo resources with the latest transparent PNG attachments, removed the logo backplate, and added a native layered shadow treatment. Added the person icon for registration, made Register a secondary outlined submit action, and removed the redundant signed-out sentence.
+- Added menu name/description/category search with a clear no-match state.
+- Added Firestore-backed sub-admin analytics for order count, sales, collected orders, average order value, average rating and top item.
+- Added a deterministic rule-based drink recommendation prototype with milk, flavour and sweetness choices. It is explicitly not a connected AI model.

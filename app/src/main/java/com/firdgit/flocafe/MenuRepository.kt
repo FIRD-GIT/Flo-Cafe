@@ -1,6 +1,19 @@
 package com.firdgit.flocafe
 
 class MenuRepository {
+    fun searchItems(query: String, category: String? = null): List<MenuItem> {
+        val normalisedQuery = query.trim().lowercase()
+        return availableItems().filter { item ->
+            (category == null || item.category == category) &&
+                (
+                    normalisedQuery.isEmpty() ||
+                        item.name.lowercase().contains(normalisedQuery) ||
+                        item.description.lowercase().contains(normalisedQuery) ||
+                        item.category.lowercase().contains(normalisedQuery)
+                )
+        }
+    }
+
     fun availableItems(): List<MenuItem> = listOf(
         MenuItem(
             id = "latte",

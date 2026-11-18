@@ -46,6 +46,7 @@ class CustomerActivity : AppCompatActivity() {
     private var displayName = "Customer"
     private var selectedTab = Tab.HOME
     private var selectedMenuCategory: String? = null
+    private var menuSearchQuery: String = ""
     private var isSubmitting = false
     private var orderListener: ListenerRegistration? = null
     private val lastKnownStatuses = mutableMapOf<String, String>()
@@ -210,6 +211,20 @@ class CustomerActivity : AppCompatActivity() {
     private fun menuView(): View = verticalScroll {
         addView(title(getString(R.string.menu_heading), 28f))
         addView(body(getString(R.string.menu_subtitle)))
+        val searchInput = android.widget.EditText(this@CustomerActivity).apply {
+            hint = getString(R.string.menu_search_hint)
+            background = roundedBackground("#FFFFFF", 18)
+            setPadding(dp(14), dp(12), dp(14), dp(12))
+            addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    menuSearchQuery = s?.toString().orEmpty()
+                    renderMenuItems(selectedMenuCategory ?: getString(R.string.category_all))
+                }
+                override fun afterTextChanged(s: android.text.Editable?) = Unit
+            })
+        }
+        addView(searchInput, spacedParams(top = 6, bottom = 6))
         addView(
             secondaryButton(getString(R.string.category_all)) {
                 renderMenuItems(getString(R.string.category_all))
@@ -227,8 +242,13 @@ class CustomerActivity : AppCompatActivity() {
         val container = contentFrame.findViewWithTag<LinearLayout>("menu_items")
             ?: return
         container.removeAllViews()
-        val items = MenuRepository().availableItems().filter {
-            selectedMenuCategory == null || it.category == selectedMenuCategory
+        val items = MenuRepository().searchItems(
+            menuSearchQuery,
+            selectedMenuCategory,
+        )
+        if (items.isEmpty()) {
+            container.addView(body(getString(R.string.menu_no_matches)))
+            return
         }
         items.groupBy { it.category }.forEach { (group, groupedItems) ->
             container.addView(sectionTitle(group))
@@ -268,8 +288,7 @@ class CustomerActivity : AppCompatActivity() {
         tag = "menu_items"
         orientation = LinearLayout.VERTICAL
         setPadding(dp(2), dp(12), dp(2), dp(16))
-        MenuRepository().availableItems()
-            .filter { category == null || it.category == category }
+        MenuRepository().searchItems(menuSearchQuery, category)
             .groupBy { it.category }
             .forEach { (group, items) ->
             addView(sectionTitle(group))
@@ -367,18 +386,36 @@ class CustomerActivity : AppCompatActivity() {
     }
 
     private fun showAiBuilderPrototype() {
-        val input = android.widget.EditText(this).apply {
-            hint = getString(R.string.ai_builder_hint)
-            setText(getString(R.string.ai_builder_suggestion))
-            minLines = 2
+        val form = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), 0, dp(20), 0)
         }
+        val milk = Spinner(this)
+        milk.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf("Semi-skimmed", "Oat", "Soya", "Almond"))
+        val flavour = Spinner(this)
+        flavour.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf("No flavour", "Vanilla", "Caramel", "Chocolate"))
+        val sweetness = Spinner(this)
+        sweetness.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf("Regular", "Less sweet", "Extra sweet", "Unsweetened"))
+        form.addView(body(getString(R.string.ai_builder_milk)))
+        form.addView(milk)
+        form.addView(body(getString(R.string.ai_builder_flavour)))
+        form.addView(flavour)
+        form.addView(body(getString(R.string.ai_builder_sweetness)))
+        form.addView(sweetness)
         AlertDialog.Builder(this)
             .setTitle(R.string.ai_builder_title)
             .setMessage(R.string.ai_builder_disclosure)
-            .setView(input)
+            .setView(form)
             .setNegativeButton(R.string.cancel_order, null)
             .setPositiveButton(R.string.ai_builder_apply) { _, _ ->
-                statusText.text = getString(R.string.ai_builder_saved, input.text.toString().trim())
+                val recommendation = DrinkRecommendation.recommend(
+                    DrinkRecommendation.Preferences(
+                        milk = milk.selectedItem.toString(),
+                        flavour = flavour.selectedItem.toString(),
+                        sweetness = sweetness.selectedItem.toString(),
+                    ),
+                )
+                statusText.text = getString(R.string.ai_builder_saved, recommendation)
                 showTab(Tab.MENU)
             }
             .show()

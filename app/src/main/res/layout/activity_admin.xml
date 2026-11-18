@@ -37,6 +37,28 @@
             android:orientation="vertical">
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/admin_analytics_heading"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/adminAnalyticsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/admin_analytics_loading" />
+
+            <EditText
+                android:id="@+id/adminOrderSearch"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:hint="@string/admin_order_search_hint"
+                android:inputType="text" />
+
+            <TextView
                 android:id="@+id/adminOrdersText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

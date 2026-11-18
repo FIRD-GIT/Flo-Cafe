@@ -5,6 +5,13 @@ requirements must be traceable to backlog items, implementation code, tests and
 visible evidence. It is also aligned with `docs/PRD.md`, `docs/BACKLOG.md` and
 `docs/IMPLEMENTATION_LOG.md`.
 
+The testing categories follow the supplied `Testing Your App.pptx`,
+`Using Junit in Android Studio.docx` and
+`CTEC3703_Programming_Assessment_Thursday_Checklist_2026.docx`.
+The programming submission and demo requirements are also checked in
+`docs/ASSESSMENT_SUBMISSION_READINESS.md` against
+`CTEC3703_Assessment_Guide_2026.pptx`.
+
 ## Automated coverage
 
 | Requirement area | Backlog | Code/evidence | Automated test | Result |
@@ -28,6 +35,11 @@ visible evidence. It is also aligned with `docs/PRD.md`, `docs/BACKLOG.md` and
 | Order persistence/history | MT-08 | Firestore code and order-history rendering compile | Execute with configured Firebase account |
 | Customer/sub-admin access boundary | MT-09 | Firestore rules and role code reviewed | Execute with synthetic customer/admin accounts |
 | Failure handling | MT-10 | `runCatching` paths and validation tests | Capture sign-in and order failure evidence |
+| Boundary values | MT-11 | Empty basket and password boundary have JVM coverage | Capture quantity and empty-state interaction |
+| Unauthorised access | MT-12 | Firestore rules and role checks reviewed | Execute with synthetic customer/admin accounts |
+| Restart persistence | MT-13 | Firestore persistence and Profile history code compile | Execute after app restart with a synthetic account |
+| Accessibility and device checks | MT-14 | Emulator inspection of labels, scrolling and spacing | Capture final supported-device evidence and document gaps |
+| Regression confirmation | MT-15 | Build and 13 JVM tests pass after changes | Attach final report and screenshot comparison |
 
 ## Commands and artefact locations
 
@@ -39,6 +51,7 @@ visible evidence. It is also aligned with `docs/PRD.md`, `docs/BACKLOG.md` and
 - HTML report: `app/build/reports/tests/testDebugUnitTest/index.html`
 - XML results: `app/build/test-results/testDebugUnitTest/`
 - Manual plan: `docs/testing/MANUAL_TEST_PLAN.md`
+- Assessment status: `docs/testing/ASSESSMENT_TEST_EVIDENCE.md`
 
 The matrix does not mark live Firebase behaviour as passed until it has been
 executed with synthetic accounts and recorded with reproducible evidence.

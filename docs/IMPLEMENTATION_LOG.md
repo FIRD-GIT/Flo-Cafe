@@ -188,6 +188,44 @@ The later supplied PNG attachments are now used directly as `horizontal_logo.png
 - **Evidence:** `docs/testing/TRACEABILITY_MATRIX.md` maps automated and manual cases, reports the current results honestly, and lists the remaining Firebase evidence.
 - **Known limitation:** no separate marking-rubric document was present in the supplied folders; the matrix therefore does not invent rubric criteria or claim live Firebase scenarios that have not been executed.
 
+## 2026-11-12 — Assessment checklist testing alignment
+
+- **Status:** Testing documentation aligned with the supplied teaching presentation, JUnit guide and Thursday assessment checklist.
+- **Requirement links:** PRD NFR-01, NFR-05, NFR-07, NFR-08, NFR-09; CAFE-13, CAFE-18.
+- **Evidence:** `docs/testing/ASSESSMENT_TEST_EVIDENCE.md` records unit, integration, UI/manual, boundary, unauthorised, failure, restart, accessibility and performance status using the checklist's D/IP/NS/N/A vocabulary.
+- **Decision:** unrun Firebase, Espresso/instrumented and Android Profiler checks remain explicitly pending rather than being represented as passed.
+
+## 2026-11-12 — Assessment guide submission alignment
+
+- **Status:** The supplied `CTEC3703_Assessment_Guide_2026.pptx` was reviewed and converted into `docs/ASSESSMENT_SUBMISSION_READINESS.md`.
+- **Evidence:** The guide's programming submission, testing, security/ethics and demo expectations now link to the repository's PRD, backlog, code justification, Firebase documentation, test plan and traceability matrix.
+- **Decision:** SQLite is marked N/A because the app uses Firebase Auth/Firestore; the separate ethical case study and phase test are recorded as assessment deliverables rather than falsely treated as app features.
+
+## 2026-11-15 — Ethics case study template alignment
+
+- **Status:** Created `docs/CTEC3703_Flo_Cafe_Ethics_Report_Template_Aligned.docx` from the supplied 2026/27 case-study template.
+- **Evidence:** The report contains the required seven numbered sections and template subheadings, a focused customer-role dilemma, Big Data factors, external/local/private AI comparison, inference-versus-training distinction, surveillance/autonomy analysis, two ethical frameworks, competing perspectives, UK GDPR/privacy/permission analysis, prioritised safeguards, conclusion, seven references, GenAI declaration and Appendices A–D.
+- **Verification:** Main report prose was later revised to 1,100 words excluding section labels, references, appendices and the GenAI declaration, at the upper limit of the required 1,000 words ±10%. Implemented, proposed and simulated features are explicitly distinguished.
+- **Limitation:** Student number, final personal wording, source verification and genuine tutor feedback must be completed by the student before submission; the fictional privacy contact must not be used for deployment.
+
+## 2026-11-18 — Menu search, Firebase analytics and rule-based drink builder
+
+- **Status:** Implemented and unit/build verified; live Firebase analytics and admin-workflow screenshots remain to be captured.
+- **Requirement links:** PRD FR-04, FR-12, NFR-05, NFR-07; CAFE-05, CAFE-12, CAFE-13.
+- **Purpose and user value:** make menu discovery faster, give authorised sub-admin users a direct operational dashboard, and provide a transparent second advanced-feature prototype.
+- **Decision and rationale:** menu search combines name, description and category filtering in pure repository logic. Firebase analytics is calculated from the existing Firestore order and feedback collections; it does not add unconfigured external services. The drink builder uses deterministic Kotlin rules with editable spinners and is explicitly described as non-AI.
+- **Code location:** `MenuRepository.kt`, `CustomerActivity.kt`, `AnalyticsCalculator.kt`, `DrinkRecommendation.kt`, `AdminActivity.kt`, `activity_admin.xml`, `strings.xml`, and the focused JVM test classes.
+- **Validation:** 19 JVM tests plus the debug build should pass after the final Gradle run. The admin should show live order count, sales, collected count, average order, average rating and top item from Firestore.
+- **Known limitations:** external push delivery is not configured; Firebase analytics currently reads stored orders and reviews rather than server-maintained counters; live multi-account screenshots and offline/restart evidence remain assessment tasks.
+
+## 2026-11-15 — Stakeholder feedback incorporated into ethics evidence
+
+- **Status:** The aligned ethics report was rewritten in a more natural, direct style and Appendix E now separates completed features, current limitations and proposed work.
+- **Relevant implemented items:** Firestore order listeners for active customer sessions, persisted profile-name edits, the Home cup-progress banner, collected-order reviews with authorised-admin visibility, and local notification attempts.
+- **Relevant limitations/proposals:** external push delivery while the app is closed is not configured, and the AI drink builder remains an editable prototype without an AI provider.
+- **Ethical treatment:** status transparency, profile accuracy/correction, notification purpose, review access/retention, profiling/autonomy and human review are discussed. Logo, visual styling, basket cup colour and emulator inspection remain implementation/evidence tasks rather than separate ethics claims.
+- **Verification:** Main report prose is now 1,100 words excluding section labels, references, appendices and the GenAI declaration. The report was rewritten in a more direct student voice after reviewing the attached detector feedback. The appendix labels implemented, limited and proposed behaviour explicitly.
+
 ## 2026-11-04 — Firebase user-role foundation
 
 - **Status:** Foundation implemented; Firebase project configuration and emulator verification remain pending.

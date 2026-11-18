@@ -17,6 +17,9 @@ class AdminActivity : AppCompatActivity() {
     private lateinit var reviewsText: TextView
     private lateinit var userRepository: UserRepository
     private lateinit var orderRepository: OrderRepository
+    private var allOrders = emptyList<OrderRepository.OrderSummary>()
+    private var allFeedback = emptyList<FeedbackRepository.Feedback>()
+    private var orderSearchQuery = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +32,15 @@ class AdminActivity : AppCompatActivity() {
         orderRepository = OrderRepository(userRepository)
 
         findViewById<Button>(R.id.logoutButton).setOnClickListener { signOut() }
+        val searchInput = findViewById<android.widget.EditText>(R.id.adminOrderSearch)
+        searchInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                orderSearchQuery = s?.toString().orEmpty()
+                renderAdminOrders(allOrders)
+            }
+            override fun afterTextChanged(s: android.text.Editable?) = Unit
+        })
         showAdminOrders()
         showReviews()
     }
@@ -37,6 +49,8 @@ class AdminActivity : AppCompatActivity() {
         lifecycleScope.launch {
             runCatching { FeedbackRepository(userRepository).allForAdmin() }
                 .onSuccess { reviews ->
+                    allFeedback = reviews
+                    renderAnalytics(allOrders)
                     reviewsText.text = if (reviews.isEmpty()) {
                         getString(R.string.no_reviews)
                     } else {
@@ -64,28 +78,54 @@ class AdminActivity : AppCompatActivity() {
         lifecycleScope.launch {
             runCatching { orderRepository.allOrders() }
                 .onSuccess { orders ->
-                    ordersText.text = if (orders.isEmpty()) {
-                        getString(R.string.no_orders)
-                    } else {
-                        getString(
-                            R.string.admin_orders,
-                            orders.joinToString("\n") {
-                                getString(
-                                    R.string.order_summary,
-                                    it.id,
-                                    it.status,
-                                    it.total,
-                                    orderProgress(it.status),
-                                )
-                            },
-                        )
-                    }
-                    orders.forEach { addStatusButton(it) }
+                    allOrders = orders
+                    renderAdminOrders(orders)
+                    renderAnalytics(orders)
                 }
                 .onFailure { error ->
                     ordersText.text = error.message ?: getString(R.string.orders_failed)
                 }
         }
+    }
+
+    private fun renderAdminOrders(orders: List<OrderRepository.OrderSummary>) {
+        orderActions.removeAllViews()
+        val query = orderSearchQuery.trim().lowercase()
+        val filtered = orders.filter {
+            query.isEmpty() ||
+                it.id.lowercase().contains(query) ||
+                it.status.lowercase().contains(query)
+        }
+        ordersText.text = if (filtered.isEmpty()) {
+            getString(R.string.no_matching_orders)
+        } else {
+            getString(
+                R.string.admin_orders,
+                filtered.joinToString("\n") {
+                    getString(
+                        R.string.order_summary,
+                        it.id,
+                        it.status,
+                        it.total,
+                        orderProgress(it.status),
+                    )
+                },
+            )
+        }
+        filtered.forEach { addStatusButton(it) }
+    }
+
+    private fun renderAnalytics(orders: List<OrderRepository.OrderSummary>) {
+        val summary = AnalyticsCalculator.summarise(orders, allFeedback)
+        findViewById<TextView>(R.id.adminAnalyticsText).text = getString(
+            R.string.admin_analytics,
+            summary.orderCount,
+            PriceFormatter.format(summary.totalSales),
+            summary.collectedCount,
+            PriceFormatter.format(summary.averageOrderValue),
+            if (summary.averageRating == 0.0) "N/A" else String.format("%.1f", summary.averageRating),
+            summary.topItemName,
+        )
     }
 
     private fun addStatusButton(order: OrderRepository.OrderSummary) {

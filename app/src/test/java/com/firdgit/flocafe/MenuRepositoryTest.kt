@@ -49,4 +49,23 @@ class MenuRepositoryTest {
         )
         assertTrue(cookie.customisationGroups.isEmpty())
     }
+
+    @Test
+    fun searchMatchesNameDescriptionAndCategory() {
+        assertTrue(MenuRepository().searchItems("latte").any { it.id == "latte" })
+        assertTrue(MenuRepository().searchItems("chocolate").any { it.id == "mocha" })
+        assertTrue(MenuRepository().searchItems("cold drinks").all { it.category == "Cold Drinks" })
+        assertEquals(
+            "cookie",
+            MenuRepository().searchItems("chocolate chip").firstOrNull()?.id,
+        )
+    }
+
+    @Test
+    fun searchSupportsCategoryFilterAndNoMatches() {
+        assertTrue(
+            MenuRepository().searchItems("", "Hot Drinks").all { it.category == "Hot Drinks" },
+        )
+        assertTrue(MenuRepository().searchItems("not-a-real-item").isEmpty())
+    }
 }
