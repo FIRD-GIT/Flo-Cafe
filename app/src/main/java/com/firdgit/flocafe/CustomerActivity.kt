@@ -332,9 +332,15 @@ class CustomerActivity : AppCompatActivity() {
         details.addView(body(PriceFormatter.format(item.price)))
         val actions = horizontalRow().apply { setPadding(0, dp(4), 0, 0) }
         if (item.isCustomisable) {
-            actions.addView(actionButton(getString(R.string.add_to_basket)) {
+            val addButton = actionButton(getString(R.string.add_to_basket)) {
                 addItemToBasket(item, getString(R.string.standard_customisation))
-            }, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(6) })
+            }.apply {
+                textSize = 13f
+                maxLines = 1
+                includeFontPadding = false
+                setPadding(dp(8), 0, dp(8), 0)
+            }
+            actions.addView(addButton, LinearLayout.LayoutParams(0, dp(44), 1f).apply { marginEnd = dp(6) })
             actions.addView(secondaryButton(getString(R.string.customise_item)) {
                 showProductDetail(item)
             }, LinearLayout.LayoutParams(0, dp(44), 1f))
