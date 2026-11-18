@@ -33,7 +33,7 @@
     <string name="home_progress_status">Status: %1$s</string>
     <string name="ai_builder_button">AI drink builder (prototype)</string>
     <string name="ai_builder_title">Build a drink idea</string>
-    <string name="ai_builder_disclosure">Prototype only: the suggestion is editable text, not a connected AI service or a promise of availability. Choose the final supported options in the product customiser before ordering.</string>
+    <string name="ai_builder_disclosure">Prototype: rule-based suggestion only. Confirm final choices in the menu customiser.</string>
     <string name="ai_builder_hint">Edit the suggestion</string>
     <string name="ai_builder_suggestion">Try an iced latte with oat milk and vanilla.</string>
     <string name="ai_builder_milk">Milk preference</string>

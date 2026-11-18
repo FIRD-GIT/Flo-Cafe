@@ -54,55 +54,89 @@
                 app:cardElevation="2dp"
                 app:cardUseCompatPadding="true">
 
-                <GridLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:columnCount="2"
                     android:padding="16dp"
-                    android:useDefaultMargins="true">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/adminMetricOrders"
-                        android:layout_width="0dp"
+                    <GridLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:text="@string/admin_metric_orders_loading" />
+                        android:columnCount="2"
+                        android:useDefaultMargins="true">
 
-                    <TextView
-                        android:id="@+id/adminMetricSales"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:text="@string/admin_metric_sales_loading" />
+                        <TextView
+                            android:id="@+id/adminMetricOrders"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_columnWeight="1"
+                            android:background="@drawable/admin_metric_tile"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="@string/admin_metric_orders_loading"
+                            android:textColor="#24202B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/adminMetricCollected"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:text="@string/admin_metric_collected_loading" />
+                        <TextView
+                            android:id="@+id/adminMetricSales"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_columnWeight="1"
+                            android:background="@drawable/admin_metric_tile"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="@string/admin_metric_sales_loading"
+                            android:textColor="#24202B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/adminMetricCollected"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_columnWeight="1"
+                            android:background="@drawable/admin_metric_tile"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="@string/admin_metric_collected_loading"
+                            android:textColor="#24202B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/adminMetricRating"
+                            android:layout_width="0dp"
+                            android:layout_height="72dp"
+                            android:layout_columnWeight="1"
+                            android:background="@drawable/admin_metric_tile"
+                            android:gravity="center"
+                            android:padding="10dp"
+                            android:text="@string/admin_metric_rating_loading"
+                            android:textColor="#24202B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </GridLayout>
 
                     <TextView
                         android:id="@+id/adminMetricAverage"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:text="@string/admin_metric_average_loading" />
-
-                    <TextView
-                        android:id="@+id/adminMetricRating"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:text="@string/admin_metric_rating_loading" />
+                        android:layout_marginTop="8dp"
+                        android:text="@string/admin_metric_average_loading"
+                        android:textColor="#4A4550"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/adminMetricTopItem"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:text="@string/admin_metric_top_loading" />
-                </GridLayout>
+                        android:layout_marginTop="4dp"
+                        android:text="@string/admin_metric_top_loading"
+                        android:textColor="#4A4550"
+                        android:textSize="14sp" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <EditText

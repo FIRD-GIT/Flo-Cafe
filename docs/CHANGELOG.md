@@ -94,3 +94,6 @@ Future entries should include:
 - Replaced the customer bottom bar with icon navigation, removed basket cup tinting, refined Profile edit action, converted category shortcuts to chips and card-wrapped sub-admin analytics.
 - Added a 25/50/75/100 active-order filling-cup progress presentation using the supplied cup mark and a custom Android progress drawable.
 - Refined customer, basket, profile and admin surfaces with icon navigation, compact category chips, a bottom-sheet drink builder, real cup artwork and card-based sub-admin order controls.
+- Fixed the active-order app-icon block with a transparent cup-only asset.
+- Split sub-admin analytics into four compact 2x2 metric tiles and strengthened advance-status actions.
+- Shortened the drink-builder prototype disclosure to a compact muted note.

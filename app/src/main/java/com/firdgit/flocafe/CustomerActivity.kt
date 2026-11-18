@@ -196,7 +196,7 @@ class CustomerActivity : AppCompatActivity() {
             background = roundedBackground("#F0E9FF", 20)
             addView(horizontalRow().apply {
                 addView(ImageView(this@CustomerActivity).apply {
-                    setImageResource(R.drawable.flo_cafe_cup)
+                    setImageResource(R.drawable.flo_cafe_cup_transparent)
                     scaleType = ImageView.ScaleType.CENTER_INSIDE
                     contentDescription = getString(R.string.coffee_progress_description, order.status)
                 }, LinearLayout.LayoutParams(dp(54), dp(54)).apply { marginEnd = dp(12) })
@@ -280,7 +280,7 @@ class CustomerActivity : AppCompatActivity() {
                     text = category
                     isCheckable = true
                     isChecked = selectedMenuCategory == category
-                    chipMinHeight = dp(40).toFloat()
+                    chipMinHeight = dp(36).toFloat()
                     setEnsureMinTouchTargetSize(true)
                     setOnClickListener {
                         selectedMenuCategory = category
@@ -289,7 +289,7 @@ class CustomerActivity : AppCompatActivity() {
                 }
                 addView(chip, GridLayout.LayoutParams().apply {
                     width = 0
-                    height = dp(48)
+                    height = dp(44)
                     columnSpec = GridLayout.spec(index % 2, 1f)
                     rowSpec = GridLayout.spec(index / 2)
                     setMargins(dp(4), dp(4), dp(4), dp(4))
@@ -456,7 +456,12 @@ class CustomerActivity : AppCompatActivity() {
                 showTab(Tab.MENU)
         }
         form.addView(applyButton, spacedParams(top = 10, bottom = 8))
-        form.addView(body(getString(R.string.ai_builder_disclosure)))
+        form.addView(TextView(this).apply {
+            text = getString(R.string.ai_builder_disclosure)
+            textSize = 12f
+            setTextColor(Color.parseColor("#777184"))
+            setPadding(0, dp(4), 0, 0)
+        })
 
         sheet.setContentView(form)
         sheet.show()

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.graphics.Color
 import android.view.Gravity
+import android.graphics.drawable.GradientDrawable
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -172,6 +173,11 @@ class AdminActivity : AppCompatActivity() {
                 isAllCaps = false
                 minHeight = dp(44)
                 setPadding(dp(12), 0, dp(12), 0)
+                setTextColor(Color.WHITE)
+                background = GradientDrawable().apply {
+                    setColor(Color.parseColor("#6A35C9"))
+                    cornerRadius = dp(22).toFloat()
+                }
                 setOnClickListener {
                     lifecycleScope.launch {
                         runCatching { orderRepository.updateStatus(order.id, nextStatus) }

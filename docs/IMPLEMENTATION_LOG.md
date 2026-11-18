@@ -218,6 +218,14 @@ The later supplied PNG attachments are now used directly as `horizontal_logo.png
 - **Validation:** the debug APK builds and 21 JVM tests pass. Emulator-5556 launched the updated app, completed customer login and showed the Pending state at 25%, icon bottom navigation and the supplied cup mark.
 - **Known limitations:** detailed 50/75/100 screenshots require live order-status transitions; accessibility labels and formal contrast checks remain to be captured.
 
+## 2026-11-18 — P0/P1/P2 visual audit fixes
+
+- **Status:** Implemented and build/emulator verified.
+- **Purpose and user value:** remove the active-order app-icon square, strengthen sub-admin actions and make analytics and prototype copy easier to scan.
+- **Decision and rationale:** the active-order card uses `flo_cafe_cup_transparent.png`, a cup-only PNG derived from the supplied branding artwork. Sub-admin analytics use four compact 2x2 tiles, and status advances use solid purple pill actions. The drink builder disclosure is a short 12sp status-style note.
+- **Code location:** `CustomerActivity.kt`, `AdminActivity.kt`, `activity_admin.xml`, `flo_cafe_cup_transparent.png`, `admin_metric_tile.xml`, `strings.xml` and the bottom-sheet builder section.
+- **Validation:** debug build and 21 JVM tests pass. Emulator screenshots verify the clean transparent cup, compact category controls, 2x2 admin metrics and visible purple admin action buttons.
+
 ## 2026-11-18 — Basket, admin and drink-builder refinement
 
 - **Status:** Implemented and build/emulator verified.
